@@ -1,7 +1,7 @@
 FROM navikey/raspbian-buster:latest
 
 # Updating and installing the necessary packages
-RUN apt-get update && apt-get upgrade && \
+RUN apt-get update && apt-get upgrade -y && \
     apt-get install curl systemd -y
 
 # Systemd settings
