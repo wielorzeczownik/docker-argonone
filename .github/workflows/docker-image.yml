@@ -39,4 +39,4 @@ jobs:
       with:
         push: true
         platforms: linux/arm/v7,linux/arm64
-        tags: manythingsatonce/argonone:latest, manythingsatonce/argonone:latest-${{ runner.cpu }}
+        tags: manythingsatonce/argonone:latest
