@@ -34,13 +34,9 @@ jobs:
       with:
         version: latest
 
-    - name: Get Python version
-      run: python --version
-      id: python_version
-
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
         push: true
         platforms: linux/arm/v7,linux/arm64
-        tags: manythingsatonce/argonone:latest, manythingsatonce/argonone:latest-${{ runner.cpu }}, manythingsatonce/argonone:${{ steps.python_version.outputs.version }}-python, manythingsatonce/argonone:${{ runner.cpu }}-${{ steps.python_version.outputs.version }}-python
+        tags: manythingsatonce/argonone:latest, manythingsatonce/argonone:latest-${{ runner.cpu }}
