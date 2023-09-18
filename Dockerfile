@@ -36,7 +36,7 @@ RUN ./argon1.sh
 RUN systemctl enable argononed
 
 # 🧹 Clean up unnecessary files and packages
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /argon1.sh
 
 # 🚪 Use systemd as the entrypoint for the container.
 CMD ["/lib/systemd/systemd"]
