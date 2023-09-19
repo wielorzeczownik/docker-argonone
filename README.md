@@ -63,7 +63,7 @@
 
 Useful when you're running an operating system other than Raspberry Pi OS.
 
-> This Docker image is based on the work of [jmercha](https://github.com/jmercha/docker-argonone).
+> This Docker image is based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone).
 
 ## 🚀 Quick Start
 
@@ -173,6 +173,28 @@ services:
   60=55
   65=100
 ```
+
+### Additionally, if you don't have I2C enabled below I insert instructions on how to enable it on `Alpine Linux` system:
+
+**Add the following line to your `/boot/config.txt` or `/boot/usercfg.txt` file:**
+
+```bash
+  dtparam=i2c_arm=on
+```
+
+**You may also need to load the i2c-dev module temporarily with the following command:**
+
+```bash
+  modprobe i2c-dev
+```
+
+**To make the module load at boot permanently, create a file called `/etc/modules-load.d/i2c.conf` with the following content:**
+
+```bash
+  i2c-dev
+```
+
+Now, your I2C hardware should be enabled, and you can proceed with configuring Argon ONE.
 
 ## 📧 Need Help or Have Questions?
 
