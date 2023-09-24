@@ -28,7 +28,7 @@
       />
     </picture>
   </a>
-  <a href="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/develop/LICENSE">
+  <a href="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/master/LICENSE">
     <picture>
       <source srcset="https://img.shields.io/badge/license-BEERWARE%20%F0%9F%8D%BA-green?style=flat-square">
       <img
@@ -78,11 +78,7 @@ version: "3.9"
 
 services:
   argonone:
-    cap_add:
-      - SYS_RAWIO
     container_name: argonone
-    devices:
-      - /dev/gpiomem:/dev/gpiomem
     image: wielorzeczownik/argonone:latest
     privileged: true
     restart: unless-stopped
@@ -105,8 +101,6 @@ services:
     --name argonone \
     --privileged \
     --restart unless-stopped \
-    --cap-add SYS_RAWIO \
-    --device /dev/gpiomem:/dev/gpiomem \
     wielorzeczownik/argonone:latest
 ```
 
@@ -121,11 +115,7 @@ services:
 
   services:
     argonone:
-      cap_add:
-        - SYS_RAWIO
       container_name: argonone
-      devices:
-        - /dev/gpiomem:/dev/gpiomem
       image: wielorzeczownik/argonone:latest
       privileged: true
       restart: unless-stopped
@@ -140,8 +130,6 @@ services:
     --name argonone \
     --privileged \
     --restart unless-stopped \
-    --cap-add SYS_RAWIO \
-    --device /dev/gpiomem:/dev/gpiomem \
     -v {your_cool_file}.conf:/etc/argononed.conf \
     wielorzeczownik/argonone:latest
 ```
