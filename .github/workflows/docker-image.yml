@@ -36,17 +36,9 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get release version
-        id: get_release_version
-        run: echo ::set-output name=RELEASE_VERSION::${{ github.ref_name }}
+          password: ${{ secrets.GIT_TOKEN }}
 
       - name: Build and push to Docker Hub and GitHub Container Registry
         run: |
           docker buildx create --use
-          docker buildx build --platform linux/arm/v7,linux/arm64 -t wielorzeczownik/argonone:${{ steps.get_release_version.outputs.RELEASE_VERSION }} -t wielorzeczownik/argonone:latest .
-          docker push wielorzeczownik/argonone:${{ steps.get_release_version.outputs.RELEASE_VERSION }}
-          docker push wielorzeczownik/argonone:latest
-          docker tag wielorzeczownik/argonone:${{ steps.get_release_version.outputs.RELEASE_VERSION }} ghcr.io/${{ github.repository }}:${{ steps.get_release_version.outputs.RELEASE_VERSION }}
-          docker push ghcr.io/${{ github.repository }}:${{ steps.get_release_version.outputs.RELEASE_VERSION }}
+          docker buildx build --platform linux/arm/v7,linux/arm64 -t ${{ github.repository_owner }}/argonone:${{ github.ref_name }} -t ${{ github.repository_owner }}/argonone:latest -t ghcr.io/${{ github.repository_owner }}/argonone:${{ github.ref_name }} -t ghcr.io/${{ github.repository_owner }}/argonone:latest . --push
