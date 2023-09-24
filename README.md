@@ -1,78 +1,142 @@
-# Docker Argon One
-**Docker version of the driver for Argon ONE 🐳**
+<h1 align="center">
+  Docker Argon One
+</h1>
 
-Helpful when you are using a system other than Raspberry Pi OS
+<p align="center">
+  <picture>
+    <source srcset="https://img.shields.io/badge/-RaspberryPi-C51A4A?style=flat-square&logo=Raspberry-Pi">
+    <img
+      src="https://img.shields.io/badge/-RaspberryPi-C51A4A?style=flat-square&logo=Raspberry-Pi"
+      alt="Raspberry Pi"
+    />
+  </picture>
+  <a href="https://hub.docker.com/r/wielorzeczownik/argonone">
+    <picture>
+      <source srcset="https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white">
+      <img
+        src="https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white"
+        alt="Docker"
+      />
+    </picture>
+  </a>
+  <a href="https://gitmoji.dev">
+    <picture>
+      <source srcset="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg?style=flat-square">
+      <img
+        src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg?style=flat-square"
+        alt="Gitmoji"
+      />
+    </picture>
+  </a>
+  <a href="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/master/LICENSE">
+    <picture>
+      <source srcset="https://img.shields.io/badge/license-BEERWARE%20%F0%9F%8D%BA-green?style=flat-square">
+      <img
+        src="https://img.shields.io/badge/license-BEERWARE%20%F0%9F%8D%BA-green?style=flat-square"
+        alt="License"
+      />
+    </picture>
+  </a>
+  <a href="https://github.com/wielorzeczownik/docker-argonone/issues">
+    <picture>
+      <source srcset="https://img.shields.io/github/issues/wielorzeczownik/docker-argonone?style=flat-square">
+      <img
+        src="https://img.shields.io/github/issues/wielorzeczownik/docker-argonone?style=flat-square"
+        alt="Issues"
+      />
+    </picture>
+  </a>
+  <a href="https://hub.docker.com/r/wielorzeczownik/argonone">
+    <picture>
+      <source srcset="https://img.shields.io/docker/pulls/wielorzeczownik/argonone?style=flat-square">
+      <img
+        src="https://img.shields.io/docker/pulls/wielorzeczownik/argonone?style=flat-square"
+        alt="Pulls"
+      />
+    </picture>
+  </a>
+</p>
 
-<a href="https://github.com/manythingsatonce/docker-argonone/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/badge/license-BEERWARE%20%F0%9F%8D%BA-green"></a> <a href="https://hub.docker.com/r/manythingsatonce/argonone"><img alt="release" src="https://img.shields.io/docker/pulls/manythingsatonce/argonone"></a> <a href="https://github.com/manythingsatonce/docker-argonone/issues"><img src="https://img.shields.io/github/issues/manythingsatonce/docker-argonone"></a>
+<p align="center">
+  Dockerized Driver for Argon ONE 🐳
+</p>
 
->This docker image is modeled after the image created by [jmercha](https://github.com/jmercha/docker-argonone).
+Useful when you're running an operating system other than Raspberry Pi OS.
 
-## Quick Start
+> This Docker image is based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone).
+
+## 🚀 Quick Start
 
 To get a local copy up and running follow these simple steps.
 
-### Docker Compose
+### Using Docker Compose
 
 1. Create `docker-compose.yml` as follows:
 
 ```yaml
-version: "3"
+version: "3.9"
 
 services:
-    argonone:
-      container_name: argonone
-      image: manythingsatonce/argonone:latest
-      privileged: true
-      volumes:
-        - /proc/device-tree:/proc/device-tree
-        - /proc/cpuinfo:/proc/cpuinfo
-        - /sys/class/gpio:/sys/class/gpio
-      restart: always
+  argonone:
+    container_name: argonone
+    image: wielorzeczownik/argonone:latest
+    privileged: true
+    restart: unless-stopped
 ```
 
-2. Run `docker compose` to build and start argonone.
+2. Run `docker compose` to start Argon ONE.
 
 ```sh
-   docker-compose up -d
+   docker compose up -d
 ```
 
-3. Done :godmode:
+3. You're all set! :godmode:
 
-### Docker Run
+### Using Docker Run
 
-1. Run the command.
+1. Run the following command:
 
-```sh
-   docker run --name argonone manythingsatonce/argonone:latest --privileged -v '/proc/device-tree:/proc/device-tree' -v '/proc/cpuinfo:/proc/cpuinfo' -v '/sys/class/gpio:/sys/class/gpio' --restart always
+```bash
+   docker run -d \
+    --name argonone \
+    --privileged \
+    --restart unless-stopped \
+    wielorzeczownik/argonone:latest
 ```
- 2. Done :finnadie:
 
-## Configuration
-**The best way to configure it is to add another volume assigned to `/etc/argononed.conf` as follows**
+2.  You're all set! :finnadie:
+
+## ⚙️ Configuration
+
+**To configure Argon ONE, add another volume mounted to `/etc/argononed.conf` as shown below:**
 
 ```yaml
-  version: "3"
+  version: "3.9"
 
   services:
-      argonone:
-        container_name: argonone
-        image: manythingsatonce/argonone:latest
-        privileged: true
-        volumes:
-          - /proc/device-tree:/proc/device-tree
-          - /proc/cpuinfo:/proc/cpuinfo
-          - /sys/class/gpio:/sys/class/gpio
-          - {your_cool_file}.conf:/etc/argononed.conf
-        restart: always
+    argonone:
+      container_name: argonone
+      image: wielorzeczownik/argonone:latest
+      privileged: true
+      restart: unless-stopped
+      volumes:
+        - {your_cool_file}.conf:/etc/argononed.conf
 ```
+
 **or**
 
- ```sh
-   docker run --name argonone manythingsatonce/argonone:latest --privileged -v '/proc/device-tree:/proc/device-tree' -v '/proc/cpuinfo:/proc/cpuinfo' -v '/sys/class/gpio:/sys/class/gpio' -v '{your_cool_file}.conf:/etc/argononed.conf' --restart always
-   ```
-### Default configuration file pattern
-
+```bash
+  docker run -d \
+    --name argonone \
+    --privileged \
+    --restart unless-stopped \
+    -v {your_cool_file}.conf:/etc/argononed.conf \
+    wielorzeczownik/argonone:latest
 ```
+
+### Default Configuration File Pattern
+
+```bash
   #
   # Argon One Fan Configuration
   #
@@ -98,6 +162,28 @@ services:
   65=100
 ```
 
-## How to get in touch?
+### Additionally, if you don't have I2C enabled below I insert instructions on how to enable it on `Alpine Linux` system:
 
-If you have a problem, write to me in a private message or open issue [here](https://github.com/manythingsatonce/docker-argonone/issues).
+**Add the following line to your `/boot/config.txt` or `/boot/usercfg.txt` file:**
+
+```bash
+  dtparam=i2c_arm=on
+```
+
+**You may also need to load the i2c-dev module temporarily with the following command:**
+
+```bash
+  modprobe i2c-dev
+```
+
+**To make the module load at boot permanently, create a file called `/etc/modules-load.d/i2c.conf` with the following content:**
+
+```bash
+  i2c-dev
+```
+
+Now, your I2C hardware should be enabled, and you can proceed with configuring Argon ONE.
+
+## 📧 Need Help or Have Questions?
+
+If you encounter any issues, feel free to send me a private message or open an issue [here](https://github.com/wielorzeczownik/docker-argonone/issues).
