@@ -3,4 +3,8 @@
   "extends": [
     "config:recommended"
   ]
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  }
 }
