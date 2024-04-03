@@ -1,14 +1,21 @@
 {
-    "$schema":"https://docs.renovatebot.com/renovate-schema.json",
-    "extends":[
-        "config:recommended"
-    ],
-     "packageRules":[
-        {
-            "matchPackagePatterns": [
-                "*"
-            ],
-            "rangeStrategy": "replace"
-        }
-    ]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "matchManagers": ["dockerfile"],
+      "matchDockerfilePaths": ["Dockerfile"],
+      "matchPackageNames": ["ubuntu"],
+      "depTypeList": ["base"],
+      "rangeStrategy": "replace"
+    },
+    {
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "matchManagers": ["github-actions"],
+      "rangeStrategy": "replace"
+    }
+  ]
 }
