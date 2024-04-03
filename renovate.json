@@ -8,7 +8,7 @@
             "matchPackagePatterns":[
                 "*"
             ],
-            "rangeStrategy": "bump",
+            "rangeStrategy": "replace",
             "automerge":true
         }
     ]
