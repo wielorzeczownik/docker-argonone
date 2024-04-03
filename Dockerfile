@@ -1,6 +1,6 @@
 # Stage 1:
 # 🐳 Start from the Ubuntu image.
-FROM ubuntu:22.04 as download-stage
+FROM ubuntu:24.04 as download-stage
 
 # 📦 Installation of curl tool.
 RUN apt-get update && apt-get install -y curl
@@ -10,7 +10,7 @@ RUN curl -L https://download.argon40.com/argon1.sh -o /argon1.sh
 
 # Stage 2:
 # 🐳 Start from the Ubuntu image.
-FROM ubuntu:22.04 as build-stage
+FROM ubuntu:24.04 as build-stage
 
 # 📝 Add information about the maintainer and the image.
 LABEL maintainer="wielorzeczownik <wielorzeczownik@furryunicorn.com>" \
