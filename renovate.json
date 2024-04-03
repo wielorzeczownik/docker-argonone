@@ -5,15 +5,11 @@
   ],
   "packageRules": [
     {
-      "matchUpdateTypes": ["major", "minor", "patch"],
       "matchManagers": ["dockerfile"],
-      "matchDockerfilePaths": ["Dockerfile"],
       "matchPackageNames": ["ubuntu"],
-      "depTypeList": ["base"],
       "rangeStrategy": "replace"
     },
     {
-      "matchUpdateTypes": ["major", "minor", "patch"],
       "matchManagers": ["github-actions"],
       "rangeStrategy": "replace"
     }
