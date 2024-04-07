@@ -17,7 +17,7 @@ LABEL maintainer="wielorzeczownik <wielorzeczownik@furryunicorn.com>" \
 description="🐳 Docker version of the driver for 🐚Argon ONE"
 
 # 📦 Update and install necessary packages.
-RUN apt-get update && apt-get install -y sudo systemd
+RUN apt-get update && apt-get install -y sudo systemd wget
 
 # 🚫 Remove any timer files to prevent errors during runtime.
 RUN find /etc/systemd -name '*.timer' | xargs rm -v || true && \
