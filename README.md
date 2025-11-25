@@ -68,8 +68,9 @@
 </p>
 
 > Based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone) with two patches included:
-> - `patches/argononed.py`: daemon respects low PWM duty cycles (<25%) without forced 100% spin-up,
-> - `patches/argonone-fanconfig.sh`: fan config accepts 0-100% duty cycle (no 30% floor).
+>
+> -   `patches/argononed.py`: daemon respects low PWM duty cycles (<25%) without forced 100% spin-up,
+> -   `patches/argonone-fanconfig.sh`: fan config accepts 0-100% duty cycle (no 30% floor).
 
 ## Run
 
@@ -79,15 +80,15 @@ The image uses systemd and must run privileged. To give the daemon access to sen
 
 ```yaml
 services:
-  argonone:
-    image: wielorzeczownik/argonone:latest
-    container_name: argonone
-    privileged: true
-    restart: unless-stopped
-    devices:
-      - /dev/i2c-1:/dev/i2c-1
-    volumes:
-      - ./argononed.conf:/etc/argononed.conf:ro
+    argonone:
+        image: wielorzeczownik/argonone:latest
+        container_name: argonone
+        privileged: true
+        restart: unless-stopped
+        devices:
+            - /dev/i2c-1:/dev/i2c-1
+        volumes:
+            - ./argononed.conf:/etc/argononed.conf:ro
 ```
 
 ```sh
@@ -143,6 +144,6 @@ Adjust the values to your needs and mount the file read-only (`:ro`) to avoid ac
 
 Ensure I2C is enabled on the host:
 
-- add `dtparam=i2c_arm=on` to `/boot/config.txt` or `/boot/usercfg.txt`,
-- load the `i2c-dev` module (`modprobe i2c-dev`) and optionally persist it in `/etc/modules-load.d/i2c.conf`,
-- expose `/dev/gpiomem` if your board uses it.
+-   add `dtparam=i2c_arm=on` to `/boot/config.txt` or `/boot/usercfg.txt`,
+-   load the `i2c-dev` module (`modprobe i2c-dev`) and optionally persist it in `/etc/modules-load.d/i2c.conf`,
+-   expose `/dev/gpiomem` if your board uses it.
