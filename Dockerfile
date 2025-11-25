@@ -1,42 +1,37 @@
-# Stage 1:
-# 🐳 Start from the Ubuntu image.
-FROM ubuntu:24.04 as download-stage
+FROM ubuntu:24.04
 
-# 📦 Installation of curl tool.
-RUN apt-get update && apt-get install -y curl
+ARG ARGON_SCRIPT_URL=https://download.argon40.com/argon1.sh
 
-# ⬇️ Download the Argon ONE driver script.
-RUN curl -L https://download.argon40.com/argon1.sh -o /argon1.sh
-
-# Stage 2:
-# 🐳 Start from the Ubuntu image.
-FROM ubuntu:24.04 as build-stage
-
-# 📝 Add information about the maintainer and the image.
 LABEL maintainer="wielorzeczownik <wielorzeczownik@furryunicorn.com>" \
-description="🐳 Docker version of the driver for 🐚Argon ONE"
+      description="🐳 Docker version of the driver for 🐚Argon ONE"
 
-# 📦 Update and install necessary packages.
-RUN apt-get update && apt-get install -y sudo systemd wget
+ENV DEBIAN_FRONTEND=noninteractive
 
-# 🚫 Remove any timer files to prevent errors during runtime.
+# Base tools for the Argon installer and daemon
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends sudo systemd wget curl ca-certificates software-properties-common \
+ && add-apt-repository -y universe \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends python3-libgpiod python3-smbus \
+ && rm -rf /var/lib/apt/lists/*
+
+# Remove timers that break in containerized systemd and set default target
 RUN find /etc/systemd -name '*.timer' | xargs rm -v || true && \
-systemctl set-default multi-user.target
+ systemctl set-default multi-user.target
 
-# 📋 Copy the downloaded script from the download-stage
-COPY --from=download-stage /argon1.sh /argon1.sh
+# Download and install Argon ONE from upstream script
+RUN curl -fsSL "${ARGON_SCRIPT_URL}" -o /tmp/argon1.sh \
+ && chmod +x /tmp/argon1.sh \
+ && /tmp/argon1.sh \
+ && rm /tmp/argon1.sh \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# ⚙️ Make the downloaded script executable
-RUN chmod +x /argon1.sh
+# Patch daemon and config tool to respect low fan duty cycles without forced spin-up / 30% floor
+COPY patches/argononed.py /etc/argon/argononed.py
+COPY patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
+RUN chmod 755 /etc/argon/argononed.py /etc/argon/argonone-fanconfig.sh
 
-# 🐚 Install drivers for Argon ONE by running the script
-RUN ./argon1.sh
-
-# 🚀 Enable the Argon ONE service.
 RUN systemctl enable argononed
 
-# 🧹 Clean up unnecessary files and packages
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /argon1.sh
-
-# 🚪 Use systemd as the entrypoint for the container.
 CMD ["/lib/systemd/systemd"]

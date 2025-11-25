@@ -64,6 +64,9 @@
 Useful when you're running an operating system other than Raspberry Pi OS.
 
 > This Docker image is based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone).
+> Patches included:
+> - `patches/argononed.py`: daemon respects low fan duty cycles (<25%) without forced 100% spin-up.
+> - `patches/argonone-fanconfig.sh`: config tool accepts 0-100% fan speeds (no 30% floor).
 
 ## 🚀 Quick Start
 
