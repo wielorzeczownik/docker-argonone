@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE=${1:-}
+BASE_OVERRIDE=${1:-}
 
-# Resolve base commit; fallback to previous commit when push event has no before SHA.
-if [[ -z "$BASE" || "$BASE" == "0000000000000000000000000000000000000000" ]]; then
-  BASE=$(git rev-parse HEAD^ 2>/dev/null || true)
+raw_tag=$(git describe --tags --abbrev=0 2>/dev/null || true)
+base_for_diff="$BASE_OVERRIDE"
+if [[ -z "$base_for_diff" ]]; then
+  base_for_diff="$raw_tag"
 fi
-if [[ -z "$BASE" ]]; then
-  BASE="HEAD"
+if [[ -z "$base_for_diff" || "$base_for_diff" == "0.0.0" ]]; then
+  base_for_diff=$(git rev-parse HEAD^ 2>/dev/null || true)
+fi
+if [[ -z "$base_for_diff" ]]; then
+  base_for_diff="HEAD"
 fi
 
 changed="false"
-if git diff --name-only "$BASE" HEAD | grep -q '^Dockerfile$'; then
+if git diff --name-only "${base_for_diff}"..HEAD | grep -q '^Dockerfile$'; then
   changed="true"
 fi
 
 {
   echo "changed=${changed}"
-  echo "base=${BASE}"
+  echo "base=${base_for_diff}"
 } >> "$GITHUB_OUTPUT"

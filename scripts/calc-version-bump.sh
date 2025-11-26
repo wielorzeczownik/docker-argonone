@@ -1,19 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE=${1:-}
-
 MAJOR_THRESHOLD=30
 MINOR_THRESHOLD=10
 
-if [[ -z "$BASE" ]]; then
-  BASE=$(git rev-parse HEAD^ 2>/dev/null || true)
+BASE_OVERRIDE=${1:-}
+
+raw_tag=$(git describe --tags --abbrev=0 2>/dev/null || true)
+last_tag=$(printf '%s' "${raw_tag:-0.0.0}" | sed 's/^[vV]//; s/^\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/')
+
+base_for_diff="$BASE_OVERRIDE"
+if [[ -z "$base_for_diff" ]]; then
+  base_for_diff="$raw_tag"
 fi
-if [[ -z "$BASE" ]]; then
-  BASE="HEAD"
+if [[ -z "$base_for_diff" || "$base_for_diff" == "0.0.0" ]]; then
+  base_for_diff=$(git rev-parse HEAD^ 2>/dev/null || true)
+fi
+if [[ -z "$base_for_diff" ]]; then
+  base_for_diff="HEAD"
 fi
 
-diff_lines=$(git diff --numstat "$BASE" HEAD -- Dockerfile | awk '{a+=$1; d+=$2} END {print a+d}')
+diff_lines=$(git diff --numstat "${base_for_diff}"..HEAD -- Dockerfile | awk '{a+=$1; d+=$2} END {print a+d}')
 if [[ -z "$diff_lines" ]]; then
   diff_lines=0
 fi
@@ -26,8 +33,6 @@ else
   bump="patch"
 fi
 
-raw_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
-last_tag=$(printf '%s' "$raw_tag" | sed 's/^[vV]//; s/^\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/')
 IFS=. read -r major minor patch <<<"$last_tag"
 major=${major:-0}
 minor=${minor:-0}
