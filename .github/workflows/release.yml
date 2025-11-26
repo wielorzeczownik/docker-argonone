@@ -21,7 +21,7 @@ jobs:
 
       - name: Detect Dockerfile changes
         id: changes
-        run: bash scripts/detect-dockerfile-change.sh "${{ github.event.before }}"
+        run: bash scripts/detect-dockerfile-change.sh
 
       - name: Stop if Dockerfile not changed
         if: steps.changes.outputs.changed != 'true'
