@@ -41,7 +41,7 @@ ${CHANGELOG}
 EOF
 
 {
-  echo "notes<<'EOF'"
+  echo "notes<<EOF"
   cat release_notes.md
   echo "EOF"
   echo "body_path=release_notes.md"
