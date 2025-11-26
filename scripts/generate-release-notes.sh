@@ -4,6 +4,12 @@ set -euo pipefail
 LAST_TAG=${1:-}
 NEW_VERSION=${2:-}
 
+if [[ -z "$NEW_VERSION" ]]; then
+  echo "Usage: $0 <last-tag> <new-version>" >&2
+  exit 1
+fi
+
+LAST_TAG="v${LAST_TAG}"
 TAG_NAME="v${NEW_VERSION}"
 RELEASE_DATE=$(date -u +%Y-%m-%d)
 
@@ -12,7 +18,7 @@ if [[ -n "$LAST_TAG" && "$LAST_TAG" != "0.0.0" ]]; then
   range="${LAST_TAG}..HEAD"
 fi
 
-CHANGELOG=$(git log --pretty=format:"- %s (%h)" $range || true)
+CHANGELOG=$(git log --pretty=format:"- %s (%h)" ${range} | grep -vE '^- Merge pull request' || true)
 if [[ -z "$CHANGELOG" ]]; then
   CHANGELOG="- No commits found"
 fi
