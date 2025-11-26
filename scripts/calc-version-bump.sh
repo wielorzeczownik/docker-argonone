@@ -20,7 +20,12 @@ if [[ -z "$base_for_diff" ]]; then
   base_for_diff="HEAD"
 fi
 
-diff_lines=$(git diff --numstat "${base_for_diff}"..HEAD -- Dockerfile | awk '{a+=$1; d+=$2} END {print a+d}')
+base_commit=$(git rev-list -n1 "$base_for_diff" 2>/dev/null || true)
+if [[ -z "$base_commit" ]]; then
+  base_commit="HEAD"
+fi
+
+diff_lines=$(git diff --numstat "${base_commit}"..HEAD -- Dockerfile | awk '{a+=$1; d+=$2} END {print a+d}')
 if [[ -z "$diff_lines" ]]; then
   diff_lines=0
 fi

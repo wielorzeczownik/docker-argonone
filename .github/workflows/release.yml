@@ -35,7 +35,7 @@ jobs:
       - name: Generate release notes
         if: steps.changes.outputs.changed == 'true'
         id: notes
-        run: bash scripts/generate-release-notes.sh "${{ steps.version.outputs.last_tag }}"
+        run: bash scripts/generate-release-notes.sh "${{ steps.version.outputs.last_tag }}" "${{ steps.version.outputs.version }}"
 
       - name: Set up QEMU
         if: steps.changes.outputs.changed == 'true'
@@ -84,4 +84,4 @@ jobs:
           token: ${{ secrets.GH_RELEASE_TOKEN }}
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
-          body: ${{ steps.notes.outputs.notes }}
+          body_path: ${{ steps.notes.outputs.body_path }}
