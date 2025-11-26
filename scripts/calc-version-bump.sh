@@ -26,7 +26,8 @@ else
   bump="patch"
 fi
 
-last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+raw_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+last_tag=$(printf '%s' "$raw_tag" | sed 's/^[vV]//; s/^\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/')
 IFS=. read -r major minor patch <<<"$last_tag"
 major=${major:-0}
 minor=${minor:-0}
