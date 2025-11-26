@@ -15,12 +15,18 @@ if [[ -z "$base_for_diff" ]]; then
   base_for_diff="HEAD"
 fi
 
+# Resolve to a concrete commit to avoid bad ranges
+base_commit=$(git rev-list -n1 "$base_for_diff" 2>/dev/null || true)
+if [[ -z "$base_commit" ]]; then
+  base_commit="HEAD"
+fi
+
 changed="false"
-if git diff --name-only "${base_for_diff}"..HEAD | grep -q '^Dockerfile$'; then
+if git diff --name-only "${base_commit}"..HEAD | grep -q '^Dockerfile$'; then
   changed="true"
 fi
 
 {
   echo "changed=${changed}"
-  echo "base=${base_for_diff}"
+  echo "base=${base_commit}"
 } >> "$GITHUB_OUTPUT"
