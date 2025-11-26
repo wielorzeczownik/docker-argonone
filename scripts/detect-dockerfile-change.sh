@@ -29,4 +29,4 @@ fi
 {
   echo "changed=${changed}"
   echo "base=${base_commit}"
-} >> "$GITHUB_OUTPUT"
+} >> "${GITHUB_OUTPUT:-/dev/null}"
