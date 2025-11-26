@@ -4,7 +4,8 @@
 
 <p align="center">
   <picture>
-    <source srcset="https://img.shields.io/badge/-RaspberryPi-C51A4A?style=flat-square&logo=Raspberry-Pi">
+    <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/-RaspberryPi-E25D6A?style=flat-square&logo=Raspberry-Pi&logoColor=white&labelColor=2d333b">
+    <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/badge/-RaspberryPi-C51A4A?style=flat-square&logo=Raspberry-Pi">
     <img
       src="https://img.shields.io/badge/-RaspberryPi-C51A4A?style=flat-square&logo=Raspberry-Pi"
       alt="Raspberry Pi"
@@ -12,25 +13,18 @@
   </picture>
   <a href="https://hub.docker.com/r/wielorzeczownik/argonone">
     <picture>
-      <source srcset="https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white">
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/docker-2496ed.svg?style=flat-square&logo=docker&logoColor=white&labelColor=2d333b">
+      <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white">
       <img
         src="https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white"
         alt="Docker"
       />
     </picture>
   </a>
-  <a href="https://gitmoji.dev">
-    <picture>
-      <source srcset="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg?style=flat-square">
-      <img
-        src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg?style=flat-square"
-        alt="Gitmoji"
-      />
-    </picture>
-  </a>
   <a href="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/master/LICENSE">
     <picture>
-      <source srcset="https://img.shields.io/badge/license-BEERWARE%20%F0%9F%8D%BA-green?style=flat-square">
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/license-BEERWARE%20%F0%9F%8D%BA-2ecc71?style=flat-square&labelColor=2d333b">
+      <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/badge/license-BEERWARE%20%F0%9F%8D%BA-green?style=flat-square">
       <img
         src="https://img.shields.io/badge/license-BEERWARE%20%F0%9F%8D%BA-green?style=flat-square"
         alt="License"
@@ -39,16 +33,28 @@
   </a>
   <a href="https://github.com/wielorzeczownik/docker-argonone/issues">
     <picture>
-      <source srcset="https://img.shields.io/github/issues/wielorzeczownik/docker-argonone?style=flat-square">
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/issues/wielorzeczownik/docker-argonone?style=flat-square&labelColor=2d333b&color=3fb950">
+      <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/github/issues/wielorzeczownik/docker-argonone?style=flat-square">
       <img
         src="https://img.shields.io/github/issues/wielorzeczownik/docker-argonone?style=flat-square"
         alt="Issues"
       />
     </picture>
   </a>
+  <a href="https://github.com/wielorzeczownik/docker-argonone/stargazers">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/stars/wielorzeczownik/docker-argonone?style=flat-square&labelColor=2d333b&color=ffa657">
+      <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/github/stars/wielorzeczownik/docker-argonone?style=flat-square">
+      <img
+        src="https://img.shields.io/github/stars/wielorzeczownik/docker-argonone?style=flat-square"
+        alt="Stars"
+      />
+    </picture>
+  </a>
   <a href="https://hub.docker.com/r/wielorzeczownik/argonone">
     <picture>
-      <source srcset="https://img.shields.io/docker/pulls/wielorzeczownik/argonone?style=flat-square">
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/docker/pulls/wielorzeczownik/argonone?style=flat-square&labelColor=2d333b&color=539bf5">
+      <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/docker/pulls/wielorzeczownik/argonone?style=flat-square">
       <img
         src="https://img.shields.io/docker/pulls/wielorzeczownik/argonone?style=flat-square"
         alt="Pulls"
@@ -58,132 +64,86 @@
 </p>
 
 <p align="center">
-  Dockerized Driver for Argon ONE 🐳
+  Dockerized Argon ONE driver for non‑Raspberry Pi OS distributions.
 </p>
 
-Useful when you're running an operating system other than Raspberry Pi OS.
+> Based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone) with two patches included:
+>
+> -   `patches/argononed.py`: daemon respects low PWM duty cycles (<25%) without forced 100% spin-up,
+> -   `patches/argonone-fanconfig.sh`: fan config accepts 0-100% duty cycle (no 30% floor).
 
-> This Docker image is based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone).
+## Run
 
-## 🚀 Quick Start
+The image uses systemd and must run privileged. To give the daemon access to sensors and I2C, pass the device nodes `/dev/i2c-1` (adjust if your board uses different paths).
 
-To get a local copy up and running follow these simple steps.
-
-### Using Docker Compose
-
-1. Create `docker-compose.yml` as follows:
+### Docker Compose
 
 ```yaml
-version: "3.9"
-
 services:
-  argonone:
-    container_name: argonone
-    image: wielorzeczownik/argonone:latest
-    privileged: true
-    restart: unless-stopped
+    argonone:
+        image: wielorzeczownik/argonone:latest
+        container_name: argonone
+        privileged: true
+        restart: unless-stopped
+        devices:
+            - /dev/i2c-1:/dev/i2c-1
+        volumes:
+            - ./argononed.conf:/etc/argononed.conf:ro
 ```
-
-2. Run `docker compose` to start Argon ONE.
 
 ```sh
-   docker compose up -d
+docker compose up -d
 ```
 
-3. You're all set! :godmode:
+You're all set! :godmode:
 
-### Using Docker Run
-
-1. Run the following command:
+### Docker Run
 
 ```bash
-   docker run -d \
-    --name argonone \
-    --privileged \
-    --restart unless-stopped \
-    wielorzeczownik/argonone:latest
+docker run -d \
+  --name argonone \
+  --privileged \
+  --restart unless-stopped \
+  --device /dev/i2c-1:/dev/i2c-1 \
+  -v $(pwd)/argononed.conf:/etc/argononed.conf:ro \
+  wielorzeczownik/argonone:latest
 ```
 
-2.  You're all set! :finnadie:
+You're all set! :finnadie:
 
-## ⚙️ Configuration
+## Fan configuration
 
-**To configure Argon ONE, add another volume mounted to `/etc/argononed.conf` as shown below:**
+`/etc/argononed.conf` defines temperature thresholds and fan speeds (percent). Default template:
 
-```yaml
-  version: "3.9"
-
-  services:
-    argonone:
-      container_name: argonone
-      image: wielorzeczownik/argonone:latest
-      privileged: true
-      restart: unless-stopped
-      volumes:
-        - {your_cool_file}.conf:/etc/argononed.conf
+```
+#
+# Argon One Fan Configuration
+#
+# List below the temperature (Celsius) and fan speed (in percent) pairs
+# Use the following form:
+# min.temperature=speed
+#
+# Example:
+# 55=10
+# 60=55
+# 65=100
+#
+# NOTE: Lines beginning with # are ignored
+#
+# Apply changes with:
+# sudo systemctl restart argononed.service
+#
+55=10
+60=55
+65=100
 ```
 
-**or**
+Adjust the values to your needs and mount the file read-only (`:ro`) to avoid accidental edits inside the container.
 
-```bash
-  docker run -d \
-    --name argonone \
-    --privileged \
-    --restart unless-stopped \
-    -v {your_cool_file}.conf:/etc/argononed.conf \
-    wielorzeczownik/argonone:latest
-```
+## Host requirements
 
-### Default Configuration File Pattern
+Ensure I2C is enabled on the host:
 
-```bash
-  #
-  # Argon One Fan Configuration
-  #
-  # List below the temperature (Celsius) and fan speed (in percent) pairs
-  # Use the following form:
-  # min.temperature=speed
-  #
-  # Example:
-  # 55=10
-  # 60=55
-  # 65=100
-  #
-  # Above example sets the fan speed to
-  #
-  # NOTE: Lines begining with # are ignored
-  #
-  # Type the following at the command line for changes to take effect:
-  # sudo systemctl restart argononed.service
-  #
-  # Start below:
-  55=10
-  60=55
-  65=100
-```
-
-### Additionally, if you don't have I2C enabled below I insert instructions on how to enable it on `Alpine Linux` system:
-
-**Add the following line to your `/boot/config.txt` or `/boot/usercfg.txt` file:**
-
-```bash
-  dtparam=i2c_arm=on
-```
-
-**You may also need to load the i2c-dev module temporarily with the following command:**
-
-```bash
-  modprobe i2c-dev
-```
-
-**To make the module load at boot permanently, create a file called `/etc/modules-load.d/i2c.conf` with the following content:**
-
-```bash
-  i2c-dev
-```
-
-Now, your I2C hardware should be enabled, and you can proceed with configuring Argon ONE.
-
-## 📧 Need Help or Have Questions?
-
-If you encounter any issues, feel free to send me a private message or open an issue [here](https://github.com/wielorzeczownik/docker-argonone/issues).
+-   add `dtparam=i2c_arm=on` to `/boot/config.txt` or `/boot/usercfg.txt`,
+-   load the `i2c-dev` module (`modprobe i2c-dev`) and optionally persist it in `/etc/modules-load.d/i2c.conf`,
+-   expose `/dev/gpiomem` if your board uses it.

@@ -1,0 +1,21 @@
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.venv/
+
+# Environment / tooling
+.env
+.env.*
+*.log
+
+# Build / temp
+dist/
+build/
+*.tmp
