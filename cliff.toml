@@ -1,11 +1,10 @@
 [changelog]
 header = """
-{% if version %}
-# Release Notes for Version {{ version }}
-{% endif %}
 """
 body = """
 {% if version %}
+# Release Notes for Version {{ version }}
+
 **Release Date: {{ timestamp | date(format="%Y-%m-%d") }}**
 
 ### What's Changed
