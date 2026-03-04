@@ -2,7 +2,7 @@
 header = """
 """
 body = """
-{% if version %}
+{% if version -%}
 # Release Notes for Version {{ version }}
 
 **Release Date: {{ timestamp | date(format="%Y-%m-%d") }}**
@@ -10,38 +10,47 @@ body = """
 ### What's Changed
 {% for group, grouped_commits in commits | group_by(attribute="group") %}
 #### {{ group }}
-{% for commit in grouped_commits %}
-- {{ commit.id | truncate(length=7, end="") }} {{ commit.message | split(pat="\n") | first | trim | split(pat=": ") | last }}
-{% endfor %}
-{% endfor %}
-{% if previous.version and remote.github.owner and remote.github.repo %}
-#### Full Changelog: [{{ previous.version }}...{{ version }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/compare/{{ previous.version }}...{{ version }})
-{% elif previous.version %}
-#### Full Changelog: {{ previous.version }}...{{ version }}
-{% endif %}
-{% endif %}
+{% for commit in grouped_commits -%}
+- {% if remote.github.owner and remote.github.repo %}[{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}){% else %}{{ commit.id | truncate(length=7, end="") }}{% endif %} {{ commit.message | split(pat="\n") | first | trim | split(pat=": ") | slice(start=1) | join(sep=": ") }}
+{% endfor -%}
+{%- endfor %}
+{%- if previous.version and remote.github.owner and remote.github.repo %}
+
+---
+**Full Changelog:** [{{ previous.version }}...{{ version }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/compare/{{ previous.version }}...{{ version }})
+{%- elif previous.version %}
+
+---
+**Full Changelog:** {{ previous.version }}...{{ version }}
+{%- endif %}
+{%- endif %}
 """
 trim = true
 
 [git]
 conventional_commits = true
-filter_unconventional = false
+filter_unconventional = true
 split_commits = false
 commit_preprocessors = [
   { pattern = "\\((.*)\\)", replace = "" },
 ]
 commit_parsers = [
+  { breaking = true, group = "Breaking Changes" },
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^chore\\(deps\\)", group = "Dependencies" },
+  { message = "^chore", skip = true },
+  { message = "^ci", skip = true },
+  { message = "^refactor", group = "Refactoring" },
+  { message = "^test", skip = true },
+  { message = "^docs", skip = true },
+  { message = "^style", skip = true },
+  { message = "^build", skip = true },
   { message = "^feat", group = "Features" },
-  { message = "^fix", group = "Fixes" },
+  { message = "^fix", group = "Bug Fixes" },
   { message = "^perf", group = "Performance" },
-  { message = "^refactor", group = "Refactor" },
-  { message = "^docs", group = "Documentation" },
-  { message = "^test", group = "Tests" },
-  { message = "^chore", group = "Chores" },
-  { message = "^ci", group = "CI" },
 ]
-protect_breaking_commits = false
-filter_commits = false
+protect_breaking_commits = true
+filter_commits = true
 tag_pattern = "v[0-9]*"
 skip_tags = "v0.0.0"
 ignore_tags = ""
