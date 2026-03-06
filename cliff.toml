@@ -2,28 +2,30 @@
 header = """
 """
 body = """
-{% if version -%}
+{% if version %}
 # Release Notes for Version {{ version }}
 
 **Release Date: {{ timestamp | date(format="%Y-%m-%d") }}**
 
 ### What's Changed
 {% for group, grouped_commits in commits | group_by(attribute="group") %}
+{% if group != "Internal" %}
 #### {{ group }}
-{% for commit in grouped_commits -%}
-- {% if remote.github.owner and remote.github.repo %}[{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}){% else %}{{ commit.id | truncate(length=7, end="") }}{% endif %} {{ commit.message | split(pat="\n") | first | trim | split(pat=": ") | slice(start=1) | join(sep=": ") }}
-{% endfor -%}
-{%- endfor %}
-{%- if previous.version and remote.github.owner and remote.github.repo %}
+{% for commit in grouped_commits %}
+- {% if remote.github.owner and remote.github.repo %}[{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}){% else %}{{ commit.id | truncate(length=7, end="") }}{% endif %} {{ commit.message | split(pat="\n") | first | trim }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% if previous.version and remote.github.owner and remote.github.repo %}
 
 ---
 **Full Changelog:** [{{ previous.version }}...{{ version }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/compare/{{ previous.version }}...{{ version }})
-{%- elif previous.version %}
+{% elif previous.version %}
 
 ---
 **Full Changelog:** {{ previous.version }}...{{ version }}
-{%- endif %}
-{%- endif %}
+{% endif %}
+{% endif %}
 """
 trim = true
 
@@ -31,12 +33,9 @@ trim = true
 conventional_commits = true
 filter_unconventional = true
 split_commits = false
-commit_preprocessors = [
-  { pattern = "\\((.*)\\)", replace = "" },
-]
 commit_parsers = [
   { breaking = true, group = "Breaking Changes" },
-  { message = "^chore\\(release\\)", skip = true },
+  { message = "^chore\\(release\\)", group = "Internal" },
   { message = "^chore\\(deps\\)", group = "Dependencies" },
   { message = "^chore", skip = true },
   { message = "^ci", skip = true },
