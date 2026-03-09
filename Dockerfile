@@ -8,6 +8,7 @@ LABEL maintainer="wielorzeczownik <wielorzeczownik@furryunicorn.com>" \
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Base tools for the Argon installer and daemon
+# hadolint ignore=DL3008
 RUN apt-get update \
  && apt-get install -y --no-install-recommends sudo systemd wget curl ca-certificates software-properties-common \
  && add-apt-repository -y universe \
@@ -16,7 +17,8 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 # Remove timers that break in containerized systemd and set default target
-RUN find /etc/systemd -name '*.timer' | xargs rm -v || true && \
+# hadolint ignore=DL4006
+RUN find /etc/systemd -name '*.timer' -print0 | xargs -0 rm -v || true && \
  systemctl set-default multi-user.target
 
 # Download and install Argon ONE from upstream script
@@ -30,8 +32,7 @@ RUN curl -fsSL "${ARGON_SCRIPT_URL}" -o /tmp/argon1.sh \
 # Patch daemon and config tool to respect low fan duty cycles without forced spin-up / 30% floor
 COPY patches/argononed.py /etc/argon/argononed.py
 COPY patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
-RUN chmod 755 /etc/argon/argononed.py /etc/argon/argonone-fanconfig.sh
-
-RUN systemctl enable argononed
+RUN chmod 755 /etc/argon/argononed.py /etc/argon/argonone-fanconfig.sh \
+ && systemctl enable argononed
 
 CMD ["/lib/systemd/systemd"]
