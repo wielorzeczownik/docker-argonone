@@ -11,6 +11,12 @@
     {
       "matchManagers": ["github-actions"],
       "semanticCommitType": "ci"
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "deps",
+      "pinDigests": true
     }
   ]
 }
