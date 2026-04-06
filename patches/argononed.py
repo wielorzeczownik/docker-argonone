@@ -32,12 +32,13 @@ from argonpowerbutton import *
 # Initialize I2C Bus
 bus = argonregister_initializebusobj()
 
-OLED_ENABLED=False
+OLED_ENABLED = False
 
 if os.path.exists("/etc/argon/argoneonoled.py"):
-	import datetime
-	from argoneonoled import *
-	OLED_ENABLED=True
+    import datetime
+    from argoneonoled import *
+
+    OLED_ENABLED = True
 
 OLED_CONFIGFILE = "/etc/argoneonoled.conf"
 UNIT_CONFIGFILE = "/etc/argonunits.conf"
@@ -47,129 +48,138 @@ SHUTDOWN_FLAGFILE = "/dev/shm/argonshutdownflag.txt"
 # This function converts the corresponding fanspeed for the given temperature
 # The configuration data is a list of strings in the form "<temperature>=<speed>"
 
+
 def get_fanspeed(tempval, configlist):
-	for curconfig in configlist:
-		curpair = curconfig.split("=")
-		tempcfg = float(curpair[0])
-		fancfg = int(float(curpair[1]))
-		if tempval >= tempcfg:
-			# PATCH: Respect the configured duty cycle exactly; avoid forcing a 25% floor.
-			if fancfg < 1:
-				return 0
-			return fancfg
-	return 0
+    for curconfig in configlist:
+        curpair = curconfig.split("=")
+        tempcfg = float(curpair[0])
+        fancfg = int(float(curpair[1]))
+        if tempval >= tempcfg:
+            # PATCH: Respect the configured duty cycle exactly; avoid forcing a 25% floor.
+            if fancfg < 1:
+                return 0
+            return fancfg
+    return 0
+
 
 # This function retrieves the fanspeed configuration list from a file, arranged by temperature
 # It ignores lines beginning with "#" and checks if the line is a valid temperature-speed pair
 # The temperature values are formatted to uniform length, so the lines can be sorted properly
 
+
 def load_config(fname):
-	newconfig = []
-	try:
-		with open(fname, "r") as fp:
-			for curline in fp:
-				if not curline:
-					continue
-				tmpline = curline.strip()
-				if not tmpline:
-					continue
-				if tmpline[0] == "#":
-					continue
-				tmppair = tmpline.split("=")
-				if len(tmppair) != 2:
-					continue
-				tempval = 0
-				fanval = 0
-				try:
-					tempval = float(tmppair[0])
-					if tempval < 0 or tempval > 100:
-						continue
-				except:
-					continue
-				try:
-					fanval = int(float(tmppair[1]))
-					if fanval < 0 or fanval > 100:
-						continue
-				except:
-					continue
-				newconfig.append( "{:5.1f}={}".format(tempval,fanval))
-		if len(newconfig) > 0:
-			newconfig.sort(reverse=True)
-	except:
-		return []
-	return newconfig
+    newconfig = []
+    try:
+        with open(fname, "r") as fp:
+            for curline in fp:
+                if not curline:
+                    continue
+                tmpline = curline.strip()
+                if not tmpline:
+                    continue
+                if tmpline[0] == "#":
+                    continue
+                tmppair = tmpline.split("=")
+                if len(tmppair) != 2:
+                    continue
+                tempval = 0
+                fanval = 0
+                try:
+                    tempval = float(tmppair[0])
+                    if tempval < 0 or tempval > 100:
+                        continue
+                except:
+                    continue
+                try:
+                    fanval = int(float(tmppair[1]))
+                    if fanval < 0 or fanval > 100:
+                        continue
+                except:
+                    continue
+                newconfig.append("{:5.1f}={}".format(tempval, fanval))
+        if len(newconfig) > 0:
+            newconfig.sort(reverse=True)
+    except:
+        return []
+    return newconfig
+
 
 # Load OLED Config file
 def load_oledconfig(fname):
-	output={}
-	screenduration=-1
-	screenlist=[]
-	try:
-		with open(fname, "r") as fp:
-			for curline in fp:
-				if not curline:
-					continue
-				tmpline = curline.strip()
-				if not tmpline:
-					continue
-				if tmpline[0] == "#":
-					continue
-				tmppair = tmpline.split("=")
-				if len(tmppair) != 2:
-					continue
-				if tmppair[0] == "switchduration":
-					output['screenduration']=int(tmppair[1])
-				elif tmppair[0] == "screensaver":
-					output['screensaver']=int(tmppair[1])
-				elif tmppair[0] == "screenlist":
-					output['screenlist']=tmppair[1].replace("\"", "").split(" ")
-				elif tmppair[0] == "enabled":
-					output['enabled']=tmppair[1].replace("\"", "")
-	except:
-		return {}
-	return output
+    output = {}
+    screenduration = -1
+    screenlist = []
+    try:
+        with open(fname, "r") as fp:
+            for curline in fp:
+                if not curline:
+                    continue
+                tmpline = curline.strip()
+                if not tmpline:
+                    continue
+                if tmpline[0] == "#":
+                    continue
+                tmppair = tmpline.split("=")
+                if len(tmppair) != 2:
+                    continue
+                if tmppair[0] == "switchduration":
+                    output["screenduration"] = int(tmppair[1])
+                elif tmppair[0] == "screensaver":
+                    output["screensaver"] = int(tmppair[1])
+                elif tmppair[0] == "screenlist":
+                    output["screenlist"] = (
+                        tmppair[1].replace('"', "").split(" ")
+                    )
+                elif tmppair[0] == "enabled":
+                    output["enabled"] = tmppair[1].replace('"', "")
+    except:
+        return {}
+    return output
+
 
 # Load Unit Config file
 def load_unitconfig(fname):
-	output={"temperature": "C"}
-	try:
-		with open(fname, "r") as fp:
-			for curline in fp:
-				if not curline:
-					continue
-				tmpline = curline.strip()
-				if not tmpline:
-					continue
-				if tmpline[0] == "#":
-					continue
-				tmppair = tmpline.split("=")
-				if len(tmppair) != 2:
-					continue
-				if tmppair[0] == "temperature":
-					output['temperature']=tmppair[1].replace("\"", "")
-	except:
-		return {}
-	return output
+    output = {"temperature": "C"}
+    try:
+        with open(fname, "r") as fp:
+            for curline in fp:
+                if not curline:
+                    continue
+                tmpline = curline.strip()
+                if not tmpline:
+                    continue
+                if tmpline[0] == "#":
+                    continue
+                tmppair = tmpline.split("=")
+                if len(tmppair) != 2:
+                    continue
+                if tmppair[0] == "temperature":
+                    output["temperature"] = tmppair[1].replace('"', "")
+    except:
+        return {}
+    return output
+
 
 def load_fancpuconfig():
-	fanconfig = ["65=100", "60=55", "55=30"]
-	tmpconfig = load_config("/etc/argononed.conf")
-	if len(tmpconfig) > 0:
-		fanconfig = tmpconfig
-	return fanconfig
+    fanconfig = ["65=100", "60=55", "55=30"]
+    tmpconfig = load_config("/etc/argononed.conf")
+    if len(tmpconfig) > 0:
+        fanconfig = tmpconfig
+    return fanconfig
 
 
 def load_fanhddconfig():
-	fanhddconfig = ["50=100", "40=55", "30=30"]
-	fanhddconfigfile = "/etc/argononed-hdd.conf"
+    fanhddconfig = ["50=100", "40=55", "30=30"]
+    fanhddconfigfile = "/etc/argononed-hdd.conf"
 
-	if os.path.isfile(fanhddconfigfile):
-		tmpconfig = load_config(fanhddconfigfile)
-		if len(tmpconfig) > 0:
-			fanhddconfig = tmpconfig
-	else:
-		fanhddconfig = []
-	return fanhddconfig
+    if os.path.isfile(fanhddconfigfile):
+        tmpconfig = load_config(fanhddconfigfile)
+        if len(tmpconfig) > 0:
+            fanhddconfig = tmpconfig
+    else:
+        fanhddconfig = []
+    return fanhddconfig
+
 
 # This function is the thread that monitors temperature and sets the fan speed
 # The value is fed to get_fanspeed to get the new fan speed
@@ -178,438 +188,607 @@ def load_fanhddconfig():
 # Location of config file varies based on OS
 #
 def temp_check():
-	INITIALSPEEDVAL = 200	# ensures fan speed gets set during initialization (e.g. change settings)
-	argonregsupport = argonregister_checksupport(bus)
+    INITIALSPEEDVAL = 200  # ensures fan speed gets set during initialization (e.g. change settings)
+    argonregsupport = argonregister_checksupport(bus)
 
-	fanconfig = load_fancpuconfig()
-	fanhddconfig = load_fanhddconfig()
+    fanconfig = load_fancpuconfig()
+    fanhddconfig = load_fanhddconfig()
 
-	prevspeed=INITIALSPEEDVAL
-	while True:
-		# Speed based on CPU Temp
-		val = argonsysinfo_getcputemp()
-		newspeed = get_fanspeed(val, fanconfig)
-		# Speed based on HDD Temp
-		val = argonsysinfo_getmaxhddtemp()
-		tmpspeed = get_fanspeed(val, fanhddconfig)
+    prevspeed = INITIALSPEEDVAL
+    while True:
+        # Speed based on CPU Temp
+        val = argonsysinfo_getcputemp()
+        newspeed = get_fanspeed(val, fanconfig)
+        # Speed based on HDD Temp
+        val = argonsysinfo_getmaxhddtemp()
+        tmpspeed = get_fanspeed(val, fanhddconfig)
 
-		# Use faster fan speed
-		if tmpspeed > newspeed:
-			newspeed = tmpspeed
+        # Use faster fan speed
+        if tmpspeed > newspeed:
+            newspeed = tmpspeed
 
-		if prevspeed == newspeed:
-			time.sleep(30)
-			continue
-		if newspeed < prevspeed and prevspeed != INITIALSPEEDVAL:
-			# Pause 30s before speed reduction to prevent fluctuations
-			time.sleep(30)
-		prevspeed = newspeed
-		try:
-			# PATCH: Apply requested speed directly; avoid forced 100% spin-up
-			# so low (e.g. 1-10%) duty cycles are honored.
-			argonregister_setfanspeed(bus, newspeed, argonregsupport)
-			time.sleep(30)
-		except IOError:
-			time.sleep(60)
+        if prevspeed == newspeed:
+            time.sleep(30)
+            continue
+        if newspeed < prevspeed and prevspeed != INITIALSPEEDVAL:
+            # Pause 30s before speed reduction to prevent fluctuations
+            time.sleep(30)
+        prevspeed = newspeed
+        try:
+            # PATCH: Apply requested speed directly; avoid forced 100% spin-up
+            # so low (e.g. 1-10%) duty cycles are honored.
+            argonregister_setfanspeed(bus, newspeed, argonregsupport)
+            time.sleep(30)
+        except IOError:
+            time.sleep(60)
+
 
 #
 # This function is the thread that updates OLED
 #
 def display_loop(readq):
-	weekdaynamelist = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-	monthlist = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
-	oledscreenwidth = oled_getmaxX()
+    weekdaynamelist = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    monthlist = [
+        "JAN",
+        "FEB",
+        "MAR",
+        "APR",
+        "MAY",
+        "JUN",
+        "JUL",
+        "AUG",
+        "SEP",
+        "OCT",
+        "NOV",
+        "DEC",
+    ]
+    oledscreenwidth = oled_getmaxX()
 
-	fontwdSml = 6	# Maps to 6x8
-	fontwdReg = 8	# Maps to 8x16
-	stdleftoffset = 54
+    fontwdSml = 6  # Maps to 6x8
+    fontwdReg = 8  # Maps to 8x16
+    stdleftoffset = 54
 
-	temperature="C"
-	tmpconfig=load_unitconfig(UNIT_CONFIGFILE)
-	if "temperature" in tmpconfig:
-		temperature = tmpconfig["temperature"]
+    temperature = "C"
+    tmpconfig = load_unitconfig(UNIT_CONFIGFILE)
+    if "temperature" in tmpconfig:
+        temperature = tmpconfig["temperature"]
 
-	screensavermode = False
-	screensaversec = 120
-	screensaverctr = 0
+    screensavermode = False
+    screensaversec = 120
+    screensaverctr = 0
 
-	screenenabled = ["clock", "ip"]
-	prevscreen = ""
-	curscreen = ""
-	screenid = 0
-	screenjogtime = 0
-	screenjogflag = 0	# start with screenid 0
-	cpuusagelist = []
-	curlist = []
+    screenenabled = ["clock", "ip"]
+    prevscreen = ""
+    curscreen = ""
+    screenid = 0
+    screenjogtime = 0
+    screenjogflag = 0  # start with screenid 0
+    cpuusagelist = []
+    curlist = []
 
-	tmpconfig=load_oledconfig(OLED_CONFIGFILE)
+    tmpconfig = load_oledconfig(OLED_CONFIGFILE)
 
-	if "screensaver" in tmpconfig:
-		screensaversec = tmpconfig["screensaver"]
-	if "screenduration" in tmpconfig:
-		screenjogtime = tmpconfig["screenduration"]
-	if "screenlist" in tmpconfig:
-		screenenabled = tmpconfig["screenlist"]
+    if "screensaver" in tmpconfig:
+        screensaversec = tmpconfig["screensaver"]
+    if "screenduration" in tmpconfig:
+        screenjogtime = tmpconfig["screenduration"]
+    if "screenlist" in tmpconfig:
+        screenenabled = tmpconfig["screenlist"]
 
-	if "enabled" in tmpconfig:
-		if tmpconfig["enabled"] == "N":
-			screenenabled = []
+    if "enabled" in tmpconfig:
+        if tmpconfig["enabled"] == "N":
+            screenenabled = []
 
-	while len(screenenabled) > 0:
-		try:
-			if os.path.isfile(SHUTDOWN_FLAGFILE):
-				display_defaultimg()
-				return
-		except:
-			pass
+    while len(screenenabled) > 0:
+        try:
+            if os.path.isfile(SHUTDOWN_FLAGFILE):
+                display_defaultimg()
+                return
+        except:
+            pass
 
-		if len(curlist) == 0 and screenjogflag == 1:
-			# Reset Screen Saver
-			screensavermode = False
-			screensaverctr = 0
+        if len(curlist) == 0 and screenjogflag == 1:
+            # Reset Screen Saver
+            screensavermode = False
+            screensaverctr = 0
 
-			# Update screen info
-			screenid = screenid + screenjogflag
-			if screenid >= len(screenenabled):
-				screenid = 0
-		prevscreen = curscreen
-		curscreen = screenenabled[screenid]
+            # Update screen info
+            screenid = screenid + screenjogflag
+            if screenid >= len(screenenabled):
+                screenid = 0
+        prevscreen = curscreen
+        curscreen = screenenabled[screenid]
 
-		if screenjogtime == 0:
-			# Resets jogflag (if switched manually)
-			screenjogflag = 0
-		else:
-			screenjogflag = 1
+        if screenjogtime == 0:
+            # Resets jogflag (if switched manually)
+            screenjogflag = 0
+        else:
+            screenjogflag = 1
 
-		needsUpdate = False
-		if curscreen == "cpu":
-			# CPU Usage
-			if len(curlist) == 0:
-				try:
-					if len(cpuusagelist) == 0:
-						cpuusagelist = argonsysinfo_listcpuusage()
-					curlist = cpuusagelist
-				except:
-					curlist = []
-			if len(curlist) > 0:
-				oled_loadbg("bgcpu")
+        needsUpdate = False
+        if curscreen == "cpu":
+            # CPU Usage
+            if len(curlist) == 0:
+                try:
+                    if len(cpuusagelist) == 0:
+                        cpuusagelist = argonsysinfo_listcpuusage()
+                    curlist = cpuusagelist
+                except:
+                    curlist = []
+            if len(curlist) > 0:
+                oled_loadbg("bgcpu")
 
-				# Display List
-				yoffset = 0
-				tmpmax = 4
-				while tmpmax > 0 and len(curlist) > 0:
-					curline = ""
-					tmpitem = curlist.pop(0)
-					curline = tmpitem["title"]+": "+str(tmpitem["value"])+"%"
-					oled_writetext(curline, stdleftoffset, yoffset, fontwdSml)
-					oled_drawfilledrectangle(stdleftoffset, yoffset+12, int((oledscreenwidth-stdleftoffset-4)*tmpitem["value"]/100), 2)
-					tmpmax = tmpmax - 1
-					yoffset = yoffset + 16
+                # Display List
+                yoffset = 0
+                tmpmax = 4
+                while tmpmax > 0 and len(curlist) > 0:
+                    curline = ""
+                    tmpitem = curlist.pop(0)
+                    curline = (
+                        tmpitem["title"] + ": " + str(tmpitem["value"]) + "%"
+                    )
+                    oled_writetext(curline, stdleftoffset, yoffset, fontwdSml)
+                    oled_drawfilledrectangle(
+                        stdleftoffset,
+                        yoffset + 12,
+                        int(
+                            (oledscreenwidth - stdleftoffset - 4)
+                            * tmpitem["value"]
+                            / 100
+                        ),
+                        2,
+                    )
+                    tmpmax = tmpmax - 1
+                    yoffset = yoffset + 16
 
-				needsUpdate = True
-			else:
-				# Next page due to error/no data
-				screenjogflag = 1
-		elif curscreen == "storage":
-			# Storage Info
-			if len(curlist) == 0:
-				try:
-					tmpobj = argonsysinfo_listhddusage()
-					for curdev in tmpobj:
-						curlist.append({"title": curdev, "value": argonsysinfo_kbstr(tmpobj[curdev]['total']), "usage": int(100*tmpobj[curdev]['used']/tmpobj[curdev]['total']) })
-					#curlist = argonsysinfo_liststoragetotal()
-				except:
-					curlist = []
-			if len(curlist) > 0:
-				oled_loadbg("bgstorage")
+                needsUpdate = True
+            else:
+                # Next page due to error/no data
+                screenjogflag = 1
+        elif curscreen == "storage":
+            # Storage Info
+            if len(curlist) == 0:
+                try:
+                    tmpobj = argonsysinfo_listhddusage()
+                    for curdev in tmpobj:
+                        curlist.append(
+                            {
+                                "title": curdev,
+                                "value": argonsysinfo_kbstr(
+                                    tmpobj[curdev]["total"]
+                                ),
+                                "usage": int(
+                                    100
+                                    * tmpobj[curdev]["used"]
+                                    / tmpobj[curdev]["total"]
+                                ),
+                            }
+                        )
+                    # curlist = argonsysinfo_liststoragetotal()
+                except:
+                    curlist = []
+            if len(curlist) > 0:
+                oled_loadbg("bgstorage")
 
-				yoffset = 16
-				tmpmax = 3
-				while tmpmax > 0 and len(curlist) > 0:
-					tmpitem = curlist.pop(0)
-					# Right column first, safer to overwrite white space
-					oled_writetextaligned(tmpitem["value"], 77, yoffset, oledscreenwidth-77, 2, fontwdSml)
-					oled_writetextaligned(str(tmpitem["usage"])+"%", 50, yoffset, 74-50, 2, fontwdSml)
-					tmpname = tmpitem["title"]
-					if len(tmpname) > 8:
-						tmpname = tmpname[0:8]
-					oled_writetext(tmpname, 0, yoffset, fontwdSml)
+                yoffset = 16
+                tmpmax = 3
+                while tmpmax > 0 and len(curlist) > 0:
+                    tmpitem = curlist.pop(0)
+                    # Right column first, safer to overwrite white space
+                    oled_writetextaligned(
+                        tmpitem["value"],
+                        77,
+                        yoffset,
+                        oledscreenwidth - 77,
+                        2,
+                        fontwdSml,
+                    )
+                    oled_writetextaligned(
+                        str(tmpitem["usage"]) + "%",
+                        50,
+                        yoffset,
+                        74 - 50,
+                        2,
+                        fontwdSml,
+                    )
+                    tmpname = tmpitem["title"]
+                    if len(tmpname) > 8:
+                        tmpname = tmpname[0:8]
+                    oled_writetext(tmpname, 0, yoffset, fontwdSml)
 
-					tmpmax = tmpmax - 1
-					yoffset = yoffset + 16
-				needsUpdate = True
-			else:
-				# Next page due to error/no data
-				screenjogflag = 1
+                    tmpmax = tmpmax - 1
+                    yoffset = yoffset + 16
+                needsUpdate = True
+            else:
+                # Next page due to error/no data
+                screenjogflag = 1
 
-		elif curscreen == "raid":
-			# Raid Info
-			if len(curlist) == 0:
-				try:
-					tmpobj = argonsysinfo_listraid()
-					curlist = tmpobj['raidlist']
-				except:
-					curlist = []
-			if len(curlist) > 0:
-				oled_loadbg("bgraid")
-				tmpitem = curlist.pop(0)
-				oled_writetextaligned(tmpitem["title"], 0, 0, stdleftoffset, 1, fontwdSml)
-				oled_writetextaligned(tmpitem["value"], 0, 8, stdleftoffset, 1, fontwdSml)
-				oled_writetextaligned(argonsysinfo_kbstr(tmpitem["info"]["size"]), 0, 56, stdleftoffset, 1, fontwdSml)
+        elif curscreen == "raid":
+            # Raid Info
+            if len(curlist) == 0:
+                try:
+                    tmpobj = argonsysinfo_listraid()
+                    curlist = tmpobj["raidlist"]
+                except:
+                    curlist = []
+            if len(curlist) > 0:
+                oled_loadbg("bgraid")
+                tmpitem = curlist.pop(0)
+                oled_writetextaligned(
+                    tmpitem["title"], 0, 0, stdleftoffset, 1, fontwdSml
+                )
+                oled_writetextaligned(
+                    tmpitem["value"], 0, 8, stdleftoffset, 1, fontwdSml
+                )
+                oled_writetextaligned(
+                    argonsysinfo_kbstr(tmpitem["info"]["size"]),
+                    0,
+                    56,
+                    stdleftoffset,
+                    1,
+                    fontwdSml,
+                )
 
-				if len(tmpitem['info']['state']) > 0:
-					oled_writetext( tmpitem['info']['state'], stdleftoffset, 8, fontwdSml )
+                if len(tmpitem["info"]["state"]) > 0:
+                    oled_writetext(
+                        tmpitem["info"]["state"], stdleftoffset, 8, fontwdSml
+                    )
 
-				if len(tmpitem['info']['rebuildstat']) > 0:
-					oled_writetext("Rebuild:" + tmpitem['info']['rebuildstat'], stdleftoffset, 16, fontwdSml)
+                if len(tmpitem["info"]["rebuildstat"]) > 0:
+                    oled_writetext(
+                        "Rebuild:" + tmpitem["info"]["rebuildstat"],
+                        stdleftoffset,
+                        16,
+                        fontwdSml,
+                    )
 
-				# TODO: May need to use different method for each raid type (i.e. check raidlist['raidlist'][raidctr]['value'])
-				#oled_writetext("Used:"+str(int(100*tmpitem["info"]["used"]/tmpitem["info"]["size"]))+"%", stdleftoffset, 24, fontwdSml)
+                # TODO: May need to use different method for each raid type (i.e. check raidlist['raidlist'][raidctr]['value'])
+                # oled_writetext("Used:"+str(int(100*tmpitem["info"]["used"]/tmpitem["info"]["size"]))+"%", stdleftoffset, 24, fontwdSml)
 
+                oled_writetext(
+                    "Active:"
+                    + str(int(tmpitem["info"]["active"]))
+                    + "/"
+                    + str(int(tmpitem["info"]["devices"])),
+                    stdleftoffset,
+                    32,
+                    fontwdSml,
+                )
+                oled_writetext(
+                    "Working:"
+                    + str(int(tmpitem["info"]["working"]))
+                    + "/"
+                    + str(int(tmpitem["info"]["devices"])),
+                    stdleftoffset,
+                    40,
+                    fontwdSml,
+                )
+                oled_writetext(
+                    "Failed:"
+                    + str(int(tmpitem["info"]["failed"]))
+                    + "/"
+                    + str(int(tmpitem["info"]["devices"])),
+                    stdleftoffset,
+                    48,
+                    fontwdSml,
+                )
+                needsUpdate = True
+            else:
+                # Next page due to error/no data
+                screenjogflag = 1
 
-				oled_writetext("Active:"+str(int(tmpitem["info"]["active"]))+"/"+str(int(tmpitem["info"]["devices"])), stdleftoffset, 32, fontwdSml)
-				oled_writetext("Working:"+str(int(tmpitem["info"]["working"]))+"/"+str(int(tmpitem["info"]["devices"])), stdleftoffset, 40, fontwdSml)
-				oled_writetext("Failed:"+str(int(tmpitem["info"]["failed"]))+"/"+str(int(tmpitem["info"]["devices"])), stdleftoffset, 48, fontwdSml)
-				needsUpdate = True
-			else:
-				# Next page due to error/no data
-				screenjogflag = 1
+        elif curscreen == "ram":
+            # RAM
+            try:
+                oled_loadbg("bgram")
+                tmpraminfo = argonsysinfo_getram()
+                oled_writetextaligned(
+                    tmpraminfo[0],
+                    stdleftoffset,
+                    8,
+                    oledscreenwidth - stdleftoffset,
+                    1,
+                    fontwdReg,
+                )
+                oled_writetextaligned(
+                    "of",
+                    stdleftoffset,
+                    24,
+                    oledscreenwidth - stdleftoffset,
+                    1,
+                    fontwdReg,
+                )
+                oled_writetextaligned(
+                    tmpraminfo[1],
+                    stdleftoffset,
+                    40,
+                    oledscreenwidth - stdleftoffset,
+                    1,
+                    fontwdReg,
+                )
+                needsUpdate = True
+            except:
+                needsUpdate = False
+                # Next page due to error/no data
+                screenjogflag = 1
+        elif curscreen == "temp":
+            # Temp
+            try:
+                oled_loadbg("bgtemp")
+                hddtempctr = 0
+                maxcval = 0
+                mincval = 200
 
-		elif curscreen == "ram":
-			# RAM
-			try:
-				oled_loadbg("bgram")
-				tmpraminfo = argonsysinfo_getram()
-				oled_writetextaligned(tmpraminfo[0], stdleftoffset, 8, oledscreenwidth-stdleftoffset, 1, fontwdReg)
-				oled_writetextaligned("of", stdleftoffset, 24, oledscreenwidth-stdleftoffset, 1, fontwdReg)
-				oled_writetextaligned(tmpraminfo[1], stdleftoffset, 40, oledscreenwidth-stdleftoffset, 1, fontwdReg)
-				needsUpdate = True
-			except:
-				needsUpdate = False
-				# Next page due to error/no data
-				screenjogflag = 1
-		elif curscreen == "temp":
-			# Temp
-			try:
-				oled_loadbg("bgtemp")
-				hddtempctr = 0
-				maxcval = 0
-				mincval = 200
+                # Get min/max of hdd temp
+                hddtempobj = argonsysinfo_gethddtemp()
+                for curdev in hddtempobj:
+                    if hddtempobj[curdev] < mincval:
+                        mincval = hddtempobj[curdev]
+                    if hddtempobj[curdev] > maxcval:
+                        maxcval = hddtempobj[curdev]
+                    hddtempctr = hddtempctr + 1
 
+                cpucval = argonsysinfo_getcputemp()
+                if hddtempctr > 0:
+                    alltempobj = {
+                        "cpu": cpucval,
+                        "hdd min": mincval,
+                        "hdd max": maxcval,
+                    }
+                    # Update max C val to CPU Temp if necessary
+                    if maxcval < cpucval:
+                        maxcval = cpucval
 
-				# Get min/max of hdd temp
-				hddtempobj = argonsysinfo_gethddtemp()
-				for curdev in hddtempobj:
-					if hddtempobj[curdev] < mincval:
-						mincval = hddtempobj[curdev]
-					if hddtempobj[curdev] > maxcval:
-						maxcval = hddtempobj[curdev]
-					hddtempctr = hddtempctr + 1
+                    displayrowht = 8
+                    displayrow = 8
+                    for curdev in alltempobj:
+                        if temperature == "C":
+                            # Celsius
+                            tmpstr = str(alltempobj[curdev])
+                            if len(tmpstr) > 4:
+                                tmpstr = tmpstr[0:4]
+                        else:
+                            # Fahrenheit
+                            tmpstr = str(32 + 9 * (alltempobj[curdev]) / 5)
+                            if len(tmpstr) > 5:
+                                tmpstr = tmpstr[0:5]
+                        if len(curdev) <= 3:
+                            oled_writetext(
+                                curdev.upper()
+                                + ": "
+                                + tmpstr
+                                + chr(167)
+                                + temperature,
+                                stdleftoffset,
+                                displayrow,
+                                fontwdSml,
+                            )
 
-				cpucval = argonsysinfo_getcputemp()
-				if hddtempctr > 0:
-					alltempobj = {"cpu": cpucval,"hdd min": mincval, "hdd max": maxcval}
-					# Update max C val to CPU Temp if necessary
-					if maxcval < cpucval:
-						maxcval = cpucval
+                        else:
+                            oled_writetext(
+                                curdev.upper() + ":",
+                                stdleftoffset,
+                                displayrow,
+                                fontwdSml,
+                            )
 
-					displayrowht = 8
-					displayrow = 8
-					for curdev in alltempobj:
-						if temperature == "C":
-							# Celsius
-							tmpstr = str(alltempobj[curdev])
-							if len(tmpstr) > 4:
-								tmpstr = tmpstr[0:4]
-						else:
-							# Fahrenheit
-							tmpstr = str(32+9*(alltempobj[curdev])/5)
-							if len(tmpstr) > 5:
-								tmpstr = tmpstr[0:5]
-						if len(curdev) <= 3:
-							oled_writetext(curdev.upper()+": "+ tmpstr+ chr(167) +temperature, stdleftoffset, displayrow, fontwdSml)
+                            oled_writetext(
+                                "     " + tmpstr + chr(167) + temperature,
+                                stdleftoffset,
+                                displayrow + displayrowht,
+                                fontwdSml,
+                            )
+                        displayrow = displayrow + displayrowht * 2
+                else:
+                    maxcval = cpucval
+                    if temperature == "C":
+                        # Celsius
+                        tmpstr = str(cpucval)
+                        if len(tmpstr) > 4:
+                            tmpstr = tmpstr[0:4]
+                    else:
+                        # Fahrenheit
+                        tmpstr = str(32 + 9 * (cpucval) / 5)
+                        if len(tmpstr) > 5:
+                            tmpstr = tmpstr[0:5]
 
-						else:
-							oled_writetext(curdev.upper()+":", stdleftoffset, displayrow, fontwdSml)
+                    oled_writetextaligned(
+                        tmpstr + chr(167) + temperature,
+                        stdleftoffset,
+                        24,
+                        oledscreenwidth - stdleftoffset,
+                        1,
+                        fontwdReg,
+                    )
 
-							oled_writetext("     "+ tmpstr+ chr(167) +temperature, stdleftoffset, displayrow+displayrowht, fontwdSml)
-						displayrow = displayrow + displayrowht*2
-				else:
-					maxcval = cpucval
-					if temperature == "C":
-						# Celsius
-						tmpstr = str(cpucval)
-						if len(tmpstr) > 4:
-							tmpstr = tmpstr[0:4]
-					else:
-						# Fahrenheit
-						tmpstr = str(32+9*(cpucval)/5)
-						if len(tmpstr) > 5:
-							tmpstr = tmpstr[0:5]
+                # Temperature Bar: 40C is min, 80C is max
+                maxht = 21
+                barht = int(maxht * (maxcval - 40) / 40)
+                if barht > maxht:
+                    barht = maxht
+                elif barht < 1:
+                    barht = 1
+                oled_drawfilledrectangle(24, 20 + (maxht - barht), 3, barht, 2)
 
-					oled_writetextaligned(tmpstr+ chr(167) +temperature, stdleftoffset, 24, oledscreenwidth-stdleftoffset, 1, fontwdReg)
+                needsUpdate = True
+            except:
+                needsUpdate = False
+                # Next page due to error/no data
+                screenjogflag = 1
+        elif curscreen == "ip":
+            # IP Address
+            try:
+                oled_loadbg("bgip")
+                oled_writetextaligned(
+                    argonsysinfo_getip(), 0, 8, oledscreenwidth, 1, fontwdReg
+                )
+                needsUpdate = True
+            except:
+                needsUpdate = False
+                # Next page due to error/no data
+                screenjogflag = 1
+        elif curscreen == "logo1v5":
+            # Logo
+            try:
+                oled_loadbg("logo1v5")
+                needsUpdate = True
+            except:
+                needsUpdate = False
+                # Next page due to error/no data
+                screenjogflag = 1
+        else:
+            try:
+                oled_loadbg("bgtime")
+                # Date and Time HH:MM
+                curtime = datetime.datetime.now()
 
-				# Temperature Bar: 40C is min, 80C is max
-				maxht = 21
-				barht = int(maxht*(maxcval-40)/40)
-				if barht > maxht:
-					barht = maxht
-				elif barht < 1:
-					barht = 1
-				oled_drawfilledrectangle(24, 20+(maxht-barht), 3, barht, 2)
+                # Month/Day
+                outstr = str(curtime.day).strip()
+                if len(outstr) < 2:
+                    outstr = " " + outstr
+                outstr = monthlist[curtime.month - 1] + outstr
+                oled_writetextaligned(
+                    outstr,
+                    stdleftoffset,
+                    8,
+                    oledscreenwidth - stdleftoffset,
+                    1,
+                    fontwdReg,
+                )
 
+                # Day of Week
+                oled_writetextaligned(
+                    weekdaynamelist[curtime.weekday()],
+                    stdleftoffset,
+                    24,
+                    oledscreenwidth - stdleftoffset,
+                    1,
+                    fontwdReg,
+                )
 
-				needsUpdate = True
-			except:
-				needsUpdate = False
-				# Next page due to error/no data
-				screenjogflag = 1
-		elif curscreen == "ip":
-			# IP Address
-			try:
-				oled_loadbg("bgip")
-				oled_writetextaligned(argonsysinfo_getip(), 0, 8, oledscreenwidth, 1, fontwdReg)
-				needsUpdate = True
-			except:
-				needsUpdate = False
-				# Next page due to error/no data
-				screenjogflag = 1
-		elif curscreen == "logo1v5":
-			# Logo
-			try:
-				oled_loadbg("logo1v5")
-				needsUpdate = True
-			except:
-				needsUpdate = False
-				# Next page due to error/no data
-				screenjogflag = 1
-		else:
-			try:
-				oled_loadbg("bgtime")
-				# Date and Time HH:MM
-				curtime = datetime.datetime.now()
+                # Time
+                outstr = str(curtime.minute).strip()
+                if len(outstr) < 2:
+                    outstr = "0" + outstr
+                outstr = str(curtime.hour) + ":" + outstr
+                if len(outstr) < 5:
+                    outstr = "0" + outstr
+                oled_writetextaligned(
+                    outstr,
+                    stdleftoffset,
+                    40,
+                    oledscreenwidth - stdleftoffset,
+                    1,
+                    fontwdReg,
+                )
 
-				# Month/Day
-				outstr = str(curtime.day).strip()
-				if len(outstr) < 2:
-					outstr = " "+outstr
-				outstr = monthlist[curtime.month-1]+outstr
-				oled_writetextaligned(outstr, stdleftoffset, 8, oledscreenwidth-stdleftoffset, 1, fontwdReg)
+                needsUpdate = True
+            except:
+                needsUpdate = False
+                # Next page due to error/no data
+                screenjogflag = 1
 
-				# Day of Week
-				oled_writetextaligned(weekdaynamelist[curtime.weekday()], stdleftoffset, 24, oledscreenwidth-stdleftoffset, 1, fontwdReg)
+        if needsUpdate == True:
+            if screensavermode == False:
+                # Update screen if not screen saver mode
+                oled_power(True)
+                oled_flushimage(prevscreen != curscreen)
+                oled_reset()
 
-				# Time
-				outstr = str(curtime.minute).strip()
-				if len(outstr) < 2:
-					outstr = "0"+outstr
-				outstr = str(curtime.hour)+":"+outstr
-				if len(outstr) < 5:
-					outstr = "0"+outstr
-				oled_writetextaligned(outstr, stdleftoffset, 40, oledscreenwidth-stdleftoffset, 1, fontwdReg)
+            timeoutcounter = 0
+            while timeoutcounter < screenjogtime or screenjogtime == 0:
+                qdata = ""
+                if readq.empty() == False:
+                    qdata = readq.get()
 
-				needsUpdate = True
-			except:
-				needsUpdate = False
-				# Next page due to error/no data
-				screenjogflag = 1
+                if qdata == "OLEDSWITCH":
+                    # Trigger screen switch
+                    screenjogflag = 1
+                    # Reset Screen Saver
+                    screensavermode = False
+                    screensaverctr = 0
 
-		if needsUpdate == True:
-			if screensavermode == False:
-				# Update screen if not screen saver mode
-				oled_power(True)
-				oled_flushimage(prevscreen != curscreen)
-				oled_reset()
+                    break
+                elif qdata == "OLEDSTOP":
+                    # End OLED Thread
+                    display_defaultimg()
+                    return
+                else:
+                    screensaverctr = screensaverctr + 1
+                    if (
+                        screensaversec <= screensaverctr
+                        and screensavermode == False
+                    ):
+                        screensavermode = True
+                        oled_fill(0)
+                        oled_reset()
+                        oled_power(False)
 
-			timeoutcounter = 0
-			while timeoutcounter<screenjogtime or screenjogtime == 0:
-				qdata = ""
-				if readq.empty() == False:
-					qdata = readq.get()
+                    if timeoutcounter == 0:
+                        # Use 1 sec sleep get CPU usage
+                        cpuusagelist = argonsysinfo_listcpuusage(1)
+                    else:
+                        time.sleep(1)
 
-				if qdata == "OLEDSWITCH":
-					# Trigger screen switch
-					screenjogflag = 1
-					# Reset Screen Saver
-					screensavermode = False
-					screensaverctr = 0
+                    timeoutcounter = timeoutcounter + 1
+                    if timeoutcounter >= 60 and screensavermode == False:
+                        # Refresh data every minute, unless screensaver got triggered
+                        screenjogflag = 0
+                        break
+    display_defaultimg()
 
-					break
-				elif qdata == "OLEDSTOP":
-					# End OLED Thread
-					display_defaultimg()
-					return
-				else:
-					screensaverctr = screensaverctr + 1
-					if screensaversec <= screensaverctr and screensavermode == False:
-						screensavermode = True
-						oled_fill(0)
-						oled_reset()
-						oled_power(False)
-
-					if timeoutcounter == 0:
-						# Use 1 sec sleep get CPU usage
-						cpuusagelist = argonsysinfo_listcpuusage(1)
-					else:
-						time.sleep(1)
-
-					timeoutcounter = timeoutcounter + 1
-					if timeoutcounter >= 60 and screensavermode == False:
-						# Refresh data every minute, unless screensaver got triggered
-						screenjogflag = 0
-						break
-	display_defaultimg()
 
 def display_defaultimg():
-	# Load default image
-	#oled_power(True)
-	#oled_loadbg("bgdefault")
-	#oled_flushimage()
-	oled_fill(0)
-	oled_reset()
+    # Load default image
+    # oled_power(True)
+    # oled_loadbg("bgdefault")
+    # oled_flushimage()
+    oled_fill(0)
+    oled_reset()
+
 
 if len(sys.argv) > 1:
-	cmd = sys.argv[1].upper()
-	if cmd == "SHUTDOWN":
-		try:
-			with open(SHUTDOWN_FLAGFILE, "w") as f:
-				f.write("signalled")
-		except:
-			pass
+    cmd = sys.argv[1].upper()
+    if cmd == "SHUTDOWN":
+        try:
+            with open(SHUTDOWN_FLAGFILE, "w") as f:
+                f.write("signalled")
+        except:
+            pass
 
-		# Signal poweroff
-		argonregister_signalpoweroff(bus)
+        # Signal poweroff
+        argonregister_signalpoweroff(bus)
 
-		if OLED_ENABLED == True:
-			display_defaultimg()
+        if OLED_ENABLED == True:
+            display_defaultimg()
 
-	elif cmd == "FANOFF":
-		# Turn off fan
-		argonregister_setfanspeed(bus,0)
+    elif cmd == "FANOFF":
+        # Turn off fan
+        argonregister_setfanspeed(bus, 0)
 
-		if OLED_ENABLED == True:
-			display_defaultimg()
+        if OLED_ENABLED == True:
+            display_defaultimg()
 
-	elif cmd == "SERVICE":
-		# Starts the power button and temperature monitor threads
-		try:
-			ipcq = Queue()
-			if len(sys.argv) > 2:
-				cmd = sys.argv[2].upper()
-			if cmd == "OLEDSWITCH":
-				t1 = Thread(target = argonpowerbutton_monitorswitch, args =(ipcq, ))
-			else:
-				t1 = Thread(target = argonpowerbutton_monitor, args =(ipcq, ))
+    elif cmd == "SERVICE":
+        # Starts the power button and temperature monitor threads
+        try:
+            ipcq = Queue()
+            if len(sys.argv) > 2:
+                cmd = sys.argv[2].upper()
+            if cmd == "OLEDSWITCH":
+                t1 = Thread(target=argonpowerbutton_monitorswitch, args=(ipcq,))
+            else:
+                t1 = Thread(target=argonpowerbutton_monitor, args=(ipcq,))
 
-			t2 = Thread(target = temp_check)
-			if OLED_ENABLED == True:
-				t3 = Thread(target = display_loop, args =(ipcq, ))
+            t2 = Thread(target=temp_check)
+            if OLED_ENABLED == True:
+                t3 = Thread(target=display_loop, args=(ipcq,))
 
-			t1.start()
-			t2.start()
-			if OLED_ENABLED == True:
-				t3.start()
+            t1.start()
+            t2.start()
+            if OLED_ENABLED == True:
+                t3.start()
 
-			ipcq.join()
-		except Exception:
-			sys.exit(1)
+            ipcq.join()
+        except Exception:
+            sys.exit(1)
