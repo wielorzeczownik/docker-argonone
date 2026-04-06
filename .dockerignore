@@ -1,1 +1,11 @@
-scripts/
+.git/
+.github/
+.venv/
+
+*.md
+*.toml
+*.json
+
+.editorconfig
+.gitignore
+.prettierrc.json
