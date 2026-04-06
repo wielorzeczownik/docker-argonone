@@ -13,10 +13,11 @@
       "semanticCommitType": "ci"
     },
     {
-      "matchManagers": ["dockerfile"],
-      "semanticCommitType": "chore",
-      "semanticCommitScope": "deps",
-      "pinDigests": true
+      "matchManagers": [
+        "dockerfile"
+      ],
+      "pinDigests": true,
+      "semanticCommitType": "chore"
     }
   ]
 }
