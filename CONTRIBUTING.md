@@ -23,20 +23,27 @@ Make sure the Dockerfile lints cleanly:
 docker run --rm -i hadolint/hadolint < Dockerfile
 ```
 
+Make sure Python patches lint cleanly with [Ruff](https://docs.astral.sh/ruff/):
+
+```bash
+ruff check patches/
+ruff format --check patches/
+```
+
 ## Commit style
 
 This project uses [Conventional Commits](https://www.conventionalcommits.org/). Commit messages drive automatic changelog generation and version bumping.
 
 Common prefixes:
 
-| Prefix | When to use |
-|--------|-------------|
-| `feat:` | New feature or behavior |
-| `fix:` | Bug fix |
-| `chore:` | Maintenance, dependency updates |
+| Prefix      | When to use                         |
+| ----------- | ----------------------------------- |
+| `feat:`     | New feature or behavior             |
+| `fix:`      | Bug fix                             |
+| `chore:`    | Maintenance, dependency updates     |
 | `refactor:` | Code change without behavior change |
-| `docs:` | Documentation only |
-| `ci:` | CI/CD changes |
+| `docs:`     | Documentation only                  |
+| `ci:`       | CI/CD changes                       |
 
 Breaking changes must include `BREAKING CHANGE:` in the commit footer.
 
@@ -44,11 +51,12 @@ Breaking changes must include `BREAKING CHANGE:` in the commit footer.
 
 - Keep PRs focused on a single concern.
 - Reference any related issue in the PR description.
-- The CI `lint` workflow must pass.
+- The CI `validate` workflow must pass (hadolint + ruff).
 
 ## Reporting bugs
 
 Open an [issue](https://github.com/wielorzeczownik/docker-argonone/issues) and include:
+
 - What you did
 - What you expected
 - What actually happened
