@@ -2,8 +2,9 @@ FROM ubuntu:24.04@sha256:186072bba1b2f436cbb91ef2567abca677337cfc786c86e107d25b7
 
 ARG ARGON_SCRIPT_URL=https://download.argon40.com/argon1.sh
 
-LABEL maintainer="wielorzeczownik <wielorzeczownik@furryunicorn.com>" \
-  description="🐳 Docker version of the driver for 🐚Argon ONE"
+LABEL org.opencontainers.image.source="https://github.com/wielorzeczownik/ahe-ics" \
+  maintainer="wielorzeczownik <wielorzeczownik@furryunicorn.com>" \
+  org.opencontainers.image.description="Dockerized Argon ONE fan-control and power-button driver for non‑Raspberry Pi OS distributions"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
