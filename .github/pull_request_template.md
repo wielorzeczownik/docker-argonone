@@ -13,6 +13,7 @@
 ## Checklist
 
 - [ ] Dockerfile lints cleanly (`docker run --rm -i hadolint/hadolint < Dockerfile`)
+- [ ] Python patches lint cleanly (`ruff check patches/ && ruff format --check patches/`)
 
 - [ ] Relevant documentation updated (README)
 
