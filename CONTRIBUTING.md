@@ -23,13 +23,6 @@ Make sure the Dockerfile lints cleanly:
 docker run --rm -i hadolint/hadolint < Dockerfile
 ```
 
-Make sure Python patches lint cleanly with [Ruff](https://docs.astral.sh/ruff/):
-
-```bash
-ruff check patches/
-ruff format --check patches/
-```
-
 ## Commit style
 
 This project uses [Conventional Commits](https://www.conventionalcommits.org/). Commit messages drive automatic changelog generation and version bumping.
