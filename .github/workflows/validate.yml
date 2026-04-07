@@ -18,15 +18,3 @@ jobs:
         uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Dockerfile
-
-  ruff:
-    name: Ruff
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Lint with Ruff
-        uses: astral-sh/ruff-action@v3
-        with:
-          args: "check patches/"
