@@ -18,3 +18,13 @@ jobs:
         uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Dockerfile
+
+  upstream-drift:
+    name: Upstream drift check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check upstream file hashes
+        run: python3 scripts/check-upstream.py
