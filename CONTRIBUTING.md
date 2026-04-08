@@ -12,8 +12,29 @@ Thank you for considering a contribution. This document describes how to get sta
 - `Dockerfile` - container image definition
 - `patches/argononed.py` - patched Argon ONE daemon (derived from upstream)
 - `patches/argonone-fanconfig.sh` - patched fan configuration script (derived from upstream)
+- `patches/upstream.sha256` - SHA256 hashes of the upstream files the patches are based on
+- `scripts/check-upstream.py` - verifies that upstream files haven't changed
+- `scripts/update-upstream.py` - refreshes `patches/upstream.sha256` after updating patches
 
 > The files in `patches/` are modifications of upstream files. Keep changes minimal and focused — do not reformat or restructure them beyond what is necessary for the fix.
+
+## Updating patches
+
+When the CI `upstream-drift` check fails, it means Argon ONE upstream has changed. To update the patches:
+
+1. Download the new upstream files and review the diff against the current `patches/`:
+   ```bash
+   curl -fsSL https://download.argon40.com/scripts/argononed.py > /tmp/argononed.py
+   curl -fsSL https://download.argon40.com/scripts/argonone-fanconfig.sh > /tmp/argonone-fanconfig.sh
+   diff /tmp/argononed.py patches/argononed.py
+   diff /tmp/argonone-fanconfig.sh patches/argonone-fanconfig.sh
+   ```
+2. Apply the necessary changes to the files in `patches/`.
+3. Refresh the stored hashes:
+   ```bash
+   python3 scripts/update-upstream.py
+   ```
+4. Commit both the updated patch files and `patches/upstream.sha256`.
 
 ## Before submitting a PR
 
@@ -44,7 +65,7 @@ Breaking changes must include `BREAKING CHANGE:` in the commit footer.
 
 - Keep PRs focused on a single concern.
 - Reference any related issue in the PR description.
-- The CI `validate` workflow must pass (hadolint + ruff).
+- The CI `validate` workflow must pass (hadolint + upstream drift check).
 
 ## Reporting bugs
 
