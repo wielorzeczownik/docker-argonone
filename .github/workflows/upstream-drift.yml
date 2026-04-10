@@ -1,0 +1,37 @@
+name: Upstream drift detection
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-drift:
+    name: Check upstream drift
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check upstream file hashes
+        id: check
+        run: |
+          set +e
+          python3 scripts/check-upstream.py > /tmp/drift-output.txt 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          { echo 'drift_output<<EOF'; cat /tmp/drift-output.txt; echo EOF; } >> "$GITHUB_OUTPUT"
+
+      - name: Create issue
+        if: steps.check.outputs.exit_code != '0'
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DRIFT_OUTPUT: ${{ steps.check.outputs.drift_output }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        with:
+          filename: .github/upstream-drift-issue.md
+          search_existing: open
