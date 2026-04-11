@@ -7,6 +7,10 @@
   <a href="https://hub.docker.com/r/wielorzeczownik/argonone"><img src="https://img.shields.io/badge/docker-2496ed.svg?style=flat-square&logo=docker&logoColor=white" alt="Docker"/></a>
 </p>
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/main/assets/logo.png" alt="Dockerized Argon ONE logo" width="520" />
+</p>
+
 Dockerized Argon ONE fan-control and power-button driver for Raspberry Pi 4 and Raspberry Pi 5 — runs on any Linux distribution, no Raspberry Pi OS required.
 
 > Based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone) with two patches included:
