@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/main/assets/logo.png" alt="Dockerized Argon ONE logo" width="520" />
+  <img src="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/master/assets/logo.png" alt="Dockerized Argon ONE logo" width="520" />
 </p>
 
 Dockerized Argon ONE fan-control and power-button driver for Raspberry Pi 4 and Raspberry Pi 5 — runs on any Linux distribution, no Raspberry Pi OS required.
