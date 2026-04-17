@@ -3,8 +3,12 @@ FROM ubuntu:24.04@sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194
 ARG ARGON_SCRIPT_URL=https://download.argon40.com/argon1.sh
 
 LABEL org.opencontainers.image.source="https://github.com/wielorzeczownik/docker-argonone" \
-  maintainer="wielorzeczownik <wielorzeczownik@furryunicorn.com>" \
-  org.opencontainers.image.description="Dockerized Argon ONE fan-control and power-button driver for non‑Raspberry Pi OS distributions"
+  org.opencontainers.image.url="https://github.com/wielorzeczownik/docker-argonone" \
+  org.opencontainers.image.documentation="https://github.com/wielorzeczownik/docker-argonone#readme" \
+  org.opencontainers.image.title="docker-argonone" \
+  org.opencontainers.image.description="Dockerized Argon ONE fan-control and power-button driver for non‑Raspberry Pi OS distributions" \
+  org.opencontainers.image.authors="wielorzeczownik" \
+  org.opencontainers.image.vendor="wielorzeczownik"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
