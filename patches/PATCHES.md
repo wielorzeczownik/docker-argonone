@@ -77,35 +77,7 @@ print(
 )
 ```
 
-### 4. Reload config every cycle (our addition, not upstream)
-
-`load_fancpuconfig()` and `load_fanhddconfig()` are moved inside the `while True` loop
-so config changes take effect within the next 30-second cycle without restarting the
-daemon. This makes `argonone-fanconfig.sh` work correctly even though its
-`systemctl restart` call is a no-op in this container.
-
-**Original** (before the loop):
-
-```python
-fanconfig = load_fancpuconfig()
-fanhddconfig = load_fanhddconfig()
-
-prevspeed = INITIALSPEEDVAL
-while True:
-    ...
-```
-
-**Patched** (inside the loop):
-
-```python
-prevspeed = INITIALSPEEDVAL
-while True:
-    fanconfig = load_fancpuconfig()
-    fanhddconfig = load_fanhddconfig()
-    ...
-```
-
-### 5. Fix `prevspeed` update on I2C failure (our addition, not upstream)
+### 4. Fix `prevspeed` update on I2C failure (our addition, not upstream)
 
 The original updates `prevspeed` before calling `argonregister_setfanspeed`. If the I2C
 call raises `IOError`, `prevspeed` is already equal to `newspeed`, so subsequent loop
@@ -136,7 +108,7 @@ except IOError:
     time.sleep(60)
 ```
 
-### 6. Fix process lifetime – `ipcq.join()` → `t2.join()` (our addition, not upstream)
+### 5. Fix process lifetime – `ipcq.join()` → `t2.join()` (our addition, not upstream)
 
 `Queue.join()` returns immediately when the queue has no unfinished tasks (count starts
 at zero). With no systemd supervisor restarting the process, this caused the daemon to

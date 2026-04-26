@@ -15,7 +15,7 @@ Dockerized Argon ONE fan-control and power-button driver for Raspberry Pi 4 and 
 
 > Based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone) with patches included:
 >
-> - `argononed.py` – daemon respects low PWM duty cycles (<25%) without a forced 100% spin-up; logs CPU temperature and fan speed to `docker logs`; reloads fan config automatically without a restart,
+> - `argononed.py` – daemon respects low PWM duty cycles (<25%) without a forced 100% spin-up; logs CPU temperature and fan speed to `docker logs`,
 > - `argonone-fanconfig.sh` – fan config accepts 0–100% duty cycle (no 30% floor).
 
 > [!NOTE]
@@ -101,7 +101,7 @@ The same image works for both RPi 4 and RPi 5 – the Argon ONE installer auto-d
 #
 # NOTE: Lines beginning with # are ignored
 #
-# Changes apply automatically within 30 seconds.
+# Apply changes with: docker restart argonone
 #
 55=10
 60=55

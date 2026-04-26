@@ -192,12 +192,11 @@ def temp_check():
     INITIALSPEEDVAL = 200  # ensures fan speed gets set during initialization (e.g. change settings)
     argonregsupport = argonregister_checksupport(bus)
 
+    fanconfig = load_fancpuconfig()
+    fanhddconfig = load_fanhddconfig()
+
     prevspeed = INITIALSPEEDVAL
     while True:
-        # PATCH: reload config every cycle so changes take effect without restart
-        fanconfig = load_fancpuconfig()
-        fanhddconfig = load_fanhddconfig()
-
         # Speed based on CPU Temp
         cpu_temp = argonsysinfo_getcputemp()
         newspeed = get_fanspeed(cpu_temp, fanconfig)
