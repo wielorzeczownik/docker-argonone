@@ -73,7 +73,7 @@ jobs:
         uses: ludeeus/action-shellcheck@2.0.0
 
       - name: Set up shfmt
-        uses: mfinelli/setup-shfmt@v3
+        uses: mfinelli/setup-shfmt@v4
 
       - name: Format check shell scripts
         run: shfmt --diff scripts/
