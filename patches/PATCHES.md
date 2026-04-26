@@ -53,28 +53,75 @@ argonregister_setfanspeed(bus, newspeed, argonregsupport)
 
 ### 3. Temperature logging (our addition, not upstream)
 
-These lines have no upstream equivalent – they are added on top of the patched file.
+These lines have no upstream equivalent — they are added on top of the patched file.
 
 - `import datetime` added to the top-level import block.
 - In `temp_check()`, the CPU temperature variable is captured as `cpu_temp` (upstream
   uses a generic `val` that gets overwritten by the HDD temperature query).
-- A `print()` call after `argonregister_setfanspeed` logs each fan-speed change with a
-  timestamp, CPU temperature, and new fan percentage to stdout, which surfaces in
-  `docker logs` thanks to `ForwardToConsole=yes` in journald.conf.
+- A `print()` call at the top of the loop logs every 30 seconds with a timestamp, CPU
+  temperature, and current fan percentage. Visible in `docker logs` because the daemon
+  runs as PID 1 (stdout goes directly to Docker's log driver).
 
 ```python
 # top-level imports
 import datetime
 
-# rename val → cpu_temp for CPU read
+# in temp_check() - rename val → cpu_temp for CPU read
 cpu_temp = argonsysinfo_getcputemp()
 newspeed = get_fanspeed(cpu_temp, fanconfig)
 
-# after argonregister_setfanspeed(...)
+# top of the while loop, before the prevspeed == newspeed check
 print(
     f"{datetime.datetime.now().isoformat(timespec='seconds')} | cpu: {cpu_temp:.1f}°C | fan: {newspeed}%",
     flush=True,
 )
+```
+
+### 4. Reload config every cycle (our addition, not upstream)
+
+`load_fancpuconfig()` and `load_fanhddconfig()` are moved inside the `while True` loop
+so config changes take effect within the next 30-second cycle without restarting the
+daemon. This makes `argonone-fanconfig.sh` work correctly even though its
+`systemctl restart` call is a no-op in this container.
+
+**Original** (before the loop):
+
+```python
+fanconfig = load_fancpuconfig()
+fanhddconfig = load_fanhddconfig()
+
+prevspeed = INITIALSPEEDVAL
+while True:
+    ...
+```
+
+**Patched** (inside the loop):
+
+```python
+prevspeed = INITIALSPEEDVAL
+while True:
+    fanconfig = load_fancpuconfig()
+    fanhddconfig = load_fanhddconfig()
+    ...
+```
+
+### 5. Fix process lifetime – `ipcq.join()` → `t2.join()` (our addition, not upstream)
+
+`Queue.join()` returns immediately when the queue has no unfinished tasks (count starts
+at zero). With no systemd supervisor restarting the process, this caused the daemon to
+exit after a single loop iteration. Blocking on the temp_check thread instead keeps the
+process alive as long as the daemon is running.
+
+**Original:**
+
+```python
+ipcq.join()
+```
+
+**Patched:**
+
+```python
+t2.join()
 ```
 
 ## `argonone-fanconfig.sh`

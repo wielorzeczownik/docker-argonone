@@ -15,18 +15,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Base tools for the Argon installer and daemon
 # hadolint ignore=DL3008
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends sudo systemd wget curl ca-certificates software-properties-common \
+  && apt-get install -y --no-install-recommends wget curl ca-certificates software-properties-common \
   && add-apt-repository -y universe \
   && apt-get update \
   && apt-get install -y --no-install-recommends python3-libgpiod python3-smbus \
   && rm -rf /var/lib/apt/lists/*
 
-# Remove timers that break in containerized systemd, set default target,
-# and forward journal to stdout so `docker logs` shows service output
+# Stubs so argon1.sh installer runs without systemd or sudo in the image.
+# sudo: pass-through (we are already root); systemctl: no-op (daemon runs directly).
 # hadolint ignore=DL4006
-RUN find /etc/systemd -name '*.timer' -print0 | xargs -0 rm -v || true && \
-  systemctl set-default multi-user.target && \
-  printf '[Journal]\nForwardToConsole=yes\n' >> /etc/systemd/journald.conf
+RUN printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo && \
+    printf '#!/bin/sh\nexit 0\n'   > /usr/local/bin/systemctl && \
+    chmod +x /usr/local/bin/sudo /usr/local/bin/systemctl
 
 # Download and install Argon ONE from upstream script
 RUN curl -fsSL "${ARGON_SCRIPT_URL}" -o /tmp/argon1.sh \
@@ -39,7 +39,12 @@ RUN curl -fsSL "${ARGON_SCRIPT_URL}" -o /tmp/argon1.sh \
 # Patch daemon and config tool to respect low fan duty cycles without forced spin-up / 30% floor
 COPY patches/argononed.py /etc/argon/argononed.py
 COPY patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
-RUN chmod 755 /etc/argon/argononed.py /etc/argon/argonone-fanconfig.sh \
-  && systemctl enable argononed
+RUN chmod 755 /etc/argon/argononed.py /etc/argon/argonone-fanconfig.sh
 
-CMD ["/lib/systemd/systemd"]
+HEALTHCHECK --interval=60s --timeout=5s --start-period=10s --retries=3 \
+  CMD python3 -c "\
+t = int(open('/sys/class/thermal/thermal_zone0/temp').read()) / 1000; \
+open('/dev/i2c-1'); \
+print(f'cpu: {t:.1f}C')"
+
+CMD ["/usr/bin/python3", "/etc/argon/argononed.py", "SERVICE"]

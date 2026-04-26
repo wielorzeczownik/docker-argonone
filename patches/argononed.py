@@ -192,11 +192,12 @@ def temp_check():
     INITIALSPEEDVAL = 200  # ensures fan speed gets set during initialization (e.g. change settings)
     argonregsupport = argonregister_checksupport(bus)
 
-    fanconfig = load_fancpuconfig()
-    fanhddconfig = load_fanhddconfig()
-
     prevspeed = INITIALSPEEDVAL
     while True:
+        # PATCH: reload config every cycle so changes take effect without restart
+        fanconfig = load_fancpuconfig()
+        fanhddconfig = load_fanhddconfig()
+
         # Speed based on CPU Temp
         cpu_temp = argonsysinfo_getcputemp()
         newspeed = get_fanspeed(cpu_temp, fanconfig)
@@ -208,6 +209,10 @@ def temp_check():
         if tmpspeed > newspeed:
             newspeed = tmpspeed
 
+        print(
+            f"{datetime.datetime.now().isoformat(timespec='seconds')} | cpu: {cpu_temp:.1f}°C | fan: {newspeed}%",
+            flush=True,
+        )
         if prevspeed == newspeed:
             time.sleep(30)
             continue
@@ -219,10 +224,6 @@ def temp_check():
             # PATCH: Apply requested speed directly; avoid forced 100% spin-up
             # so low (e.g. 1-10%) duty cycles are honored.
             argonregister_setfanspeed(bus, newspeed, argonregsupport)
-            print(
-                f"{datetime.datetime.now().isoformat(timespec='seconds')} | cpu: {cpu_temp:.1f}°C | fan: {newspeed}%",
-                flush=True,
-            )
             time.sleep(30)
         except IOError:
             time.sleep(60)
@@ -794,6 +795,10 @@ if len(sys.argv) > 1:
             if OLED_ENABLED == True:
                 t3.start()
 
-            ipcq.join()
+            # PATCH: block on temp_check thread instead of ipcq.join() —
+            # Queue.join() returns immediately on an empty queue, causing the
+            # process to exit after the first loop iteration when running as
+            # a plain process (no systemd supervisor).
+            t2.join()
         except Exception:
             sys.exit(1)
