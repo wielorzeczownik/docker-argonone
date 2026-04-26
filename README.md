@@ -19,7 +19,7 @@ Dockerized Argon ONE fan-control and power-button driver for Raspberry Pi 4 and 
 > - `argonone-fanconfig.sh` – fan config accepts 0–100% duty cycle (no 30% floor).
 
 > [!NOTE]
-> Power button support (shutdown/reboot) was available up to v1.0.7 when the container ran systemd. From v1.1.0 the daemon runs directly as PID 1 – fan control works fully, but the power button no longer triggers an OS shutdown.
+> Power button support (shutdown/reboot) was available up to v1.0.7 when the container ran systemd. From v2.0.0 the daemon runs directly as PID 1 – fan control works fully, but the power button no longer triggers an OS shutdown.
 
 ## Run
 
