@@ -1,0 +1,9 @@
+target-version = "py39"
+
+[lint]
+select = ["F"]
+ignore = [
+  "F403", # (argonsysinfo, argonregister, argonpowerbutton)
+  "F405", # imports unresolvable
+  "F841", # unused variables
+]

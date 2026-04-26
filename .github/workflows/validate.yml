@@ -19,6 +19,41 @@ jobs:
         with:
           dockerfile: Dockerfile
 
+  ruff:
+    name: Ruff
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Lint scripts
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: check scripts/
+
+      - name: Lint patches
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: check patches/
+
+      - name: Format check scripts
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: format --check scripts/
+
+  smoke-build:
+    name: Smoke build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+
   upstream-drift:
     name: Upstream drift check
     runs-on: ubuntu-latest

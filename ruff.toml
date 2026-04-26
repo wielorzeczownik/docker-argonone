@@ -1,6 +1,6 @@
 line-length = 80
 target-version = "py312"
-src = ["patches"]
+src = ["scripts"]
 extend-exclude = [".git", ".mypy_cache", ".ruff_cache", ".venv"]
 
 [lint]
