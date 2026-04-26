@@ -62,6 +62,34 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Lint shell scripts
+        uses: ludeeus/action-shellcheck@v2
+
+      - name: Set up shfmt
+        uses: mfinelli/setup-shfmt@v3
+
+      - name: Format check shell scripts
+        run: shfmt --diff scripts/
+
+  markdownlint:
+    name: markdownlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Lint Markdown
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: "**/*.md"
+
   upstream-drift:
     name: Upstream drift check
     runs-on: ubuntu-latest
