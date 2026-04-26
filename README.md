@@ -11,16 +11,19 @@
   <img src="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/master/assets/logo.png" alt="Dockerized Argon ONE logo" width="520" />
 </p>
 
-Dockerized Argon ONE fan-control and power-button driver for Raspberry Pi 4 and Raspberry Pi 5 — runs on any Linux distribution, no Raspberry Pi OS required.
+Dockerized Argon ONE fan-control and power-button driver for Raspberry Pi 4 and Raspberry Pi 5 – runs on any Linux distribution, no Raspberry Pi OS required.
 
-> Based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone) with two patches included:
+> Based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone) with patches included:
 >
-> - `argononed.py` — daemon respects low PWM duty cycles (<25%) without a forced 100% spin-up,
-> - `argonone-fanconfig.sh` — fan config accepts 0–100% duty cycle (no 30% floor).
+> - `argononed.py` – daemon respects low PWM duty cycles (<25%) without a forced 100% spin-up; logs CPU temperature and fan speed to `docker logs`; reloads fan config automatically without a restart,
+> - `argonone-fanconfig.sh` – fan config accepts 0–100% duty cycle (no 30% floor).
+
+> [!NOTE]
+> Power button support (shutdown/reboot) was available up to v1.0.7 when the container ran systemd. From v1.1.0 the daemon runs directly as PID 1 – fan control works fully, but the power button no longer triggers an OS shutdown.
 
 ## Run
 
-The container runs systemd and requires `--privileged` to access hardware registers. Pass `/dev/i2c-1` so the daemon can reach the Argon ONE MCU over I2C.
+Pass `/dev/i2c-1` so the daemon can reach the Argon ONE MCU over I2C, and `/dev/gpiochip0` for power button GPIO.
 
 ### Docker Compose
 
@@ -29,7 +32,6 @@ services:
   argonone:
     image: wielorzeczownik/argonone:latest
     container_name: argonone
-    privileged: true
     restart: unless-stopped
     devices:
       - /dev/i2c-1:/dev/i2c-1
@@ -47,7 +49,6 @@ docker compose up -d
 ```bash
 docker run -d \
   --name argonone \
-  --privileged \
   --restart unless-stopped \
   --device /dev/i2c-1:/dev/i2c-1 \
   --device /dev/gpiochip0:/dev/gpiochip0 \
@@ -57,7 +58,7 @@ docker run -d \
 
 ## Raspberry Pi 5
 
-Raspberry Pi 5 moves the user-facing GPIO lines to the RP1 I/O chip, exposed as `/dev/gpiochip4` instead of `/dev/gpiochip0` used on earlier models. Add one extra device entry — everything else stays the same.
+Raspberry Pi 5 moves the user-facing GPIO lines to the RP1 I/O chip, exposed as `/dev/gpiochip4` instead of `/dev/gpiochip0` used on earlier models. Add one extra device entry – everything else stays the same.
 
 Docker Compose:
 
@@ -72,7 +73,6 @@ Docker Run:
 ```bash
 docker run -d \
   --name argonone \
-  --privileged \
   --restart unless-stopped \
   --device /dev/i2c-1:/dev/i2c-1 \
   --device /dev/gpiochip4:/dev/gpiochip4 \
@@ -80,7 +80,7 @@ docker run -d \
   wielorzeczownik/argonone:latest
 ```
 
-The same image works for both RPi 4 and RPi 5 — the Argon ONE installer auto-detects the board model from `/proc/cpuinfo`, which is passed through from the host in Docker.
+The same image works for both RPi 4 and RPi 5 – the Argon ONE installer auto-detects the board model from `/proc/cpuinfo`, which is passed through from the host in Docker.
 
 ## Fan configuration
 
@@ -101,15 +101,14 @@ The same image works for both RPi 4 and RPi 5 — the Argon ONE installer auto-d
 #
 # NOTE: Lines beginning with # are ignored
 #
-# Apply changes with:
-# sudo systemctl restart argononed.service
+# Changes apply automatically within 30 seconds.
 #
 55=10
 60=55
 65=100
 ```
 
-Mount the file read-only (`:ro`) to avoid accidental edits inside the container. Values of `0` are honored (fan fully off) — no 30% floor is enforced.
+Mount the file read-only (`:ro`) to avoid accidental edits inside the container. Values of `0` are honored (fan fully off) – no 30% floor is enforced.
 
 ## Host requirements
 

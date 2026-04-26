@@ -17,7 +17,7 @@ Thank you for considering a contribution. This document describes how to get sta
 - `scripts/check-upstream.py` – verifies that upstream files haven't changed
 - `scripts/update-upstream.py` – refreshes `patches/upstream.sha256` after updating patches
 
-> The files in `patches/` are modifications of upstream files. Keep changes minimal and focused — do not reformat or restructure them beyond what is necessary for the fix.
+> The files in `patches/` are modifications of upstream files. Keep changes minimal and focused – do not reformat or restructure them beyond what is necessary for the fix.
 
 ## Updating patches
 

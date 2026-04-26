@@ -21,14 +21,15 @@ You will receive a response within **7 days**. If the issue is confirmed, a fix 
 
 ## Scope
 
-This project runs a privileged Docker container with access to I2C hardware. The attack surface includes:
+This project runs a Docker container with direct access to hardware devices. The attack surface includes:
 
-- The container runs with `--privileged` and access to `/dev/i2c-1`
+- The container accesses `/dev/i2c-1` (fan/MCU communication) and `/dev/gpiochip0` or `/dev/gpiochip4` (power button GPIO)
 - The daemon communicates with hardware via I2C
+- The daemon runs as root (PID 1) inside the container
 
 Issues related to the upstream Argon ONE daemon or the original scripts are out of scope.
 
 ## Security notes
 
-- The container requires privileged access to communicate with hardware.
+- The container does not require `--privileged`; grant only the specific device nodes it needs.
 - Keep the base image up to date.
