@@ -21,10 +21,12 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends python3-libgpiod python3-smbus \
   && rm -rf /var/lib/apt/lists/*
 
-# Remove timers that break in containerized systemd and set default target
+# Remove timers that break in containerized systemd, set default target,
+# and forward journal to stdout so `docker logs` shows service output
 # hadolint ignore=DL4006
 RUN find /etc/systemd -name '*.timer' -print0 | xargs -0 rm -v || true && \
-  systemctl set-default multi-user.target
+  systemctl set-default multi-user.target && \
+  printf '[Journal]\nForwardToConsole=yes\n' >> /etc/systemd/journald.conf
 
 # Download and install Argon ONE from upstream script
 RUN curl -fsSL "${ARGON_SCRIPT_URL}" -o /tmp/argon1.sh \

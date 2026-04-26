@@ -21,6 +21,7 @@
 import sys
 import os
 import time
+import datetime
 from threading import Thread
 from queue import Queue
 
@@ -197,8 +198,8 @@ def temp_check():
     prevspeed = INITIALSPEEDVAL
     while True:
         # Speed based on CPU Temp
-        val = argonsysinfo_getcputemp()
-        newspeed = get_fanspeed(val, fanconfig)
+        cpu_temp = argonsysinfo_getcputemp()
+        newspeed = get_fanspeed(cpu_temp, fanconfig)
         # Speed based on HDD Temp
         val = argonsysinfo_getmaxhddtemp()
         tmpspeed = get_fanspeed(val, fanhddconfig)
@@ -218,6 +219,10 @@ def temp_check():
             # PATCH: Apply requested speed directly; avoid forced 100% spin-up
             # so low (e.g. 1-10%) duty cycles are honored.
             argonregister_setfanspeed(bus, newspeed, argonregsupport)
+            print(
+                f"{datetime.datetime.now().isoformat(timespec='seconds')} | cpu: {cpu_temp:.1f}°C | fan: {newspeed}%",
+                flush=True,
+            )
             time.sleep(30)
         except IOError:
             time.sleep(60)
