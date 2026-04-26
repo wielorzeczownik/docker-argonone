@@ -70,7 +70,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Lint shell scripts
-        uses: ludeeus/action-shellcheck@v2
+        uses: ludeeus/action-shellcheck@2.0.0
 
       - name: Set up shfmt
         uses: mfinelli/setup-shfmt@v3
