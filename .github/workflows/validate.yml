@@ -29,17 +29,20 @@ jobs:
       - name: Lint scripts
         uses: astral-sh/ruff-action@v3
         with:
-          args: check scripts/
+          args: check
+          src: scripts/
 
       - name: Lint patches
         uses: astral-sh/ruff-action@v3
         with:
-          args: check patches/
+          args: check
+          src: patches/
 
       - name: Format check scripts
         uses: astral-sh/ruff-action@v3
         with:
-          args: format --check scripts/
+          args: format --check
+          src: scripts/
 
   smoke-build:
     name: Smoke build
