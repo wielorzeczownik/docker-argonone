@@ -105,7 +105,38 @@ while True:
     ...
 ```
 
-### 5. Fix process lifetime – `ipcq.join()` → `t2.join()` (our addition, not upstream)
+### 5. Fix `prevspeed` update on I2C failure (our addition, not upstream)
+
+The original updates `prevspeed` before calling `argonregister_setfanspeed`. If the I2C
+call raises `IOError`, `prevspeed` is already equal to `newspeed`, so subsequent loop
+iterations see `prevspeed == newspeed` and skip the hardware update indefinitely. Config
+changes that result in the same speed are silently ignored until the next temperature
+change forces a different `newspeed`. Moving the update inside the `try` block ensures
+`prevspeed` is only advanced when the hardware is actually updated.
+
+**Original:**
+
+```python
+prevspeed = newspeed
+try:
+    argonregister_setfanspeed(bus, newspeed, argonregsupport)
+    time.sleep(30)
+except IOError:
+    time.sleep(60)
+```
+
+**Patched:**
+
+```python
+try:
+    argonregister_setfanspeed(bus, newspeed, argonregsupport)
+    prevspeed = newspeed
+    time.sleep(30)
+except IOError:
+    time.sleep(60)
+```
+
+### 6. Fix process lifetime – `ipcq.join()` → `t2.join()` (our addition, not upstream)
 
 `Queue.join()` returns immediately when the queue has no unfinished tasks (count starts
 at zero). With no systemd supervisor restarting the process, this caused the daemon to

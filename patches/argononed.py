@@ -219,11 +219,11 @@ def temp_check():
         if newspeed < prevspeed and prevspeed != INITIALSPEEDVAL:
             # Pause 30s before speed reduction to prevent fluctuations
             time.sleep(30)
-        prevspeed = newspeed
         try:
             # PATCH: Apply requested speed directly; avoid forced 100% spin-up
             # so low (e.g. 1-10%) duty cycles are honored.
             argonregister_setfanspeed(bus, newspeed, argonregsupport)
+            prevspeed = newspeed
             time.sleep(30)
         except IOError:
             time.sleep(60)
