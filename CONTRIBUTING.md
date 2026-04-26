@@ -9,12 +9,13 @@ Thank you for considering a contribution. This document describes how to get sta
 
 ## Project structure
 
-- `Dockerfile` - container image definition
-- `patches/argononed.py` - patched Argon ONE daemon (derived from upstream)
-- `patches/argonone-fanconfig.sh` - patched fan configuration script (derived from upstream)
-- `patches/upstream.sha256` - SHA256 hashes of the upstream files the patches are based on
-- `scripts/check-upstream.py` - verifies that upstream files haven't changed
-- `scripts/update-upstream.py` - refreshes `patches/upstream.sha256` after updating patches
+- `Dockerfile` – container image definition
+- `patches/argononed.py` – patched Argon ONE daemon (derived from upstream)
+- `patches/argonone-fanconfig.sh` – patched fan configuration script (derived from upstream)
+- [`patches/PATCHES.md`](patches/PATCHES.md) – describes every change made to the upstream files and why
+- `patches/upstream.sha256` – SHA256 hashes of the upstream files the patches are based on
+- `scripts/check-upstream.py` – verifies that upstream files haven't changed
+- `scripts/update-upstream.py` – refreshes `patches/upstream.sha256` after updating patches
 
 > The files in `patches/` are modifications of upstream files. Keep changes minimal and focused — do not reformat or restructure them beyond what is necessary for the fix.
 
@@ -29,7 +30,7 @@ When the CI `upstream-drift` check fails, it means Argon ONE upstream has change
    diff /tmp/argononed.py patches/argononed.py
    diff /tmp/argonone-fanconfig.sh patches/argonone-fanconfig.sh
    ```
-2. Apply the necessary changes to the files in `patches/`.
+2. Re-apply the changes documented in [`patches/PATCHES.md`](patches/PATCHES.md) to the new upstream files.
 3. Refresh the stored hashes:
    ```bash
    python3 scripts/update-upstream.py
