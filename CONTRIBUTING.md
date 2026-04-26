@@ -24,17 +24,21 @@ Thank you for considering a contribution. This document describes how to get sta
 When the CI `upstream-drift` check fails, it means Argon ONE upstream has changed. To update the patches:
 
 1. Download the new upstream files and review the diff against the current `patches/`:
+
    ```bash
    curl -fsSL https://download.argon40.com/scripts/argononed.py > /tmp/argononed.py
    curl -fsSL https://download.argon40.com/scripts/argonone-fanconfig.sh > /tmp/argonone-fanconfig.sh
    diff /tmp/argononed.py patches/argononed.py
    diff /tmp/argonone-fanconfig.sh patches/argonone-fanconfig.sh
    ```
+
 2. Re-apply the changes documented in [`patches/PATCHES.md`](patches/PATCHES.md) to the new upstream files.
 3. Refresh the stored hashes:
+
    ```bash
    python3 scripts/update-upstream.py
    ```
+
 4. Commit both the updated patch files and `patches/upstream.sha256`.
 
 ## Before submitting a PR

@@ -8,6 +8,6 @@ One or more upstream files no longer match the hashes in `patches/upstream.sha25
 
 ## Script output
 
-```
+```text
 {{ env.DRIFT_OUTPUT }}
 ```
