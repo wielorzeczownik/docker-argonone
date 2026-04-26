@@ -1,7 +1,7 @@
 line-length = 80
 target-version = "py312"
 src = ["scripts"]
-extend-exclude = [".git", ".mypy_cache", ".ruff_cache", ".venv"]
+extend-exclude = [".git", ".mypy_cache", ".ruff_cache", ".venv", "patches"]
 
 [lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4"]
