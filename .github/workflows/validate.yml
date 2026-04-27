@@ -10,9 +10,12 @@ jobs:
   hadolint:
     name: Hadolint
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.3.0
@@ -22,9 +25,12 @@ jobs:
   ruff:
     name: Ruff
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Lint scripts
         uses: astral-sh/ruff-action@v4.0.0
@@ -47,33 +53,47 @@ jobs:
   smoke-build:
     name: Smoke build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@v4.0.0
 
       - name: Build Docker image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v7.1.0
         with:
           context: .
           push: false
+          load: true
+          tags: argonone:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  shellcheck:
-    name: ShellCheck
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: argonone:test
+          format: table
+          exit-code: "1"
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+  shfmt:
+    name: shfmt
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Lint shell scripts
-        uses: ludeeus/action-shellcheck@master
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Set up shfmt
-        uses: mfinelli/setup-shfmt@v4
+        uses: mfinelli/setup-shfmt@v4.0.1
 
       - name: Format check shell scripts
         run: shfmt --diff scripts/
@@ -81,21 +101,27 @@ jobs:
   markdownlint:
     name: markdownlint
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Lint Markdown
-        uses: DavidAnson/markdownlint-cli2-action@v23
+        uses: DavidAnson/markdownlint-cli2-action@v23.0.0
         with:
           globs: "**/*.md"
 
   upstream-drift:
     name: Upstream drift check
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Check upstream file hashes
         run: python3 scripts/check-upstream.py
