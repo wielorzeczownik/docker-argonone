@@ -5,6 +5,11 @@ Thank you for considering a contribution. This document describes how to get sta
 ## Prerequisites
 
 - Docker with Buildx
+- Python 3
+- [hadolint](https://github.com/hadolint/hadolint)
+- [shfmt](https://github.com/mvdan/sh)
+- [ruff](https://docs.astral.sh/ruff/)
+- [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2)
 - A Raspberry Pi or ARM device for testing (or QEMU for emulation)
 
 ## Project structure
@@ -16,6 +21,7 @@ Thank you for considering a contribution. This document describes how to get sta
 - `patches/upstream.sha256` – SHA256 hashes of the upstream files the patches are based on
 - `scripts/check-upstream.py` – verifies that upstream files haven't changed
 - `scripts/update-upstream.py` – refreshes `patches/upstream.sha256` after updating patches
+- `scripts/resolve-version.sh` – determines the next release version from git-cliff output
 
 > The files in `patches/` are modifications of upstream files. Keep changes minimal and focused – do not reformat or restructure them beyond what is necessary for the fix.
 
@@ -43,11 +49,32 @@ When the CI `upstream-drift` check fails, it means Argon ONE upstream has change
 
 ## Before submitting a PR
 
-Make sure the Dockerfile lints cleanly:
+Run all checks locally before opening a pull request.
+
+### With tools installed locally
 
 ```bash
-docker run --rm -i hadolint/hadolint < Dockerfile
+hadolint Dockerfile
+ruff check scripts/ patches/
+ruff format --check scripts/
+shfmt --diff scripts/
+markdownlint-cli2 "**/*.md"
 ```
+
+### With Docker (no local installs required)
+
+```bash
+docker run --rm -v "$(pwd):/src" -w /src hadolint/hadolint hadolint Dockerfile
+
+docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff check scripts/ patches/
+docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff format --check scripts/
+
+docker run --rm -v "$(pwd):/src" -w /src mvdan/shfmt --diff scripts/
+
+docker run --rm -v "$(pwd):/workdir" davidanson/markdownlint-cli2 "**/*.md"
+```
+
+The CI runs all of the above plus a Docker smoke build and a vulnerability scan of the resulting image.
 
 ## Commit style
 
@@ -70,7 +97,7 @@ Breaking changes must include `BREAKING CHANGE:` in the commit footer.
 
 - Keep PRs focused on a single concern.
 - Reference any related issue in the PR description.
-- The CI `validate` workflow must pass (hadolint + upstream drift check).
+- All CI checks must pass: Dockerfile linting, Python linting, shell linting, Markdown linting, smoke build, and vulnerability scan.
 
 ## Reporting bugs
 
