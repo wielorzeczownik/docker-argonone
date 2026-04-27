@@ -24,7 +24,7 @@ Examples of unacceptable behavior:
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by opening a [GitHub issue](https://github.com/wielorzeczownik/docker-argonone/issues) or contacting the maintainers directly via GitHub. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported privately by contacting the maintainer directly at [github.com/wielorzeczownik](https://github.com/wielorzeczownik). Do not open a public issue. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
 
 ## Attribution
 
