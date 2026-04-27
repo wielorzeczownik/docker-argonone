@@ -12,9 +12,12 @@
 
 ## Checklist
 
-- [ ] Dockerfile lints cleanly (`docker run --rm -i hadolint/hadolint < Dockerfile`)
-- [ ] Python patches lint cleanly (`ruff check patches/ && ruff format --check patches/`)
+<!-- Check only what applies to this PR -->
 
+- [ ] Dockerfile lints cleanly — if `Dockerfile` changed
+- [ ] Python lints cleanly — if `patches/` or `scripts/` (`.py`) changed
+- [ ] Shell scripts formatted — if `scripts/` (`.sh`) changed
+- [ ] Markdown lints cleanly — if any `.md` changed
 - [ ] Relevant documentation updated (README)
 
 ## Related issue
