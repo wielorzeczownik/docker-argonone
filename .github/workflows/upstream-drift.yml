@@ -13,9 +13,12 @@ jobs:
   check-drift:
     name: Check upstream drift
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Check upstream file hashes
         id: check
@@ -27,7 +30,7 @@ jobs:
 
       - name: Create issue
         if: steps.check.outputs.exit_code != '0'
-        uses: JasonEtco/create-an-issue@v2
+        uses: JasonEtco/create-an-issue@v2.9.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
           DRIFT_OUTPUT: ${{ steps.check.outputs.drift_output }}
