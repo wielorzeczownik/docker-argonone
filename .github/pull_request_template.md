@@ -18,7 +18,7 @@
 - [ ] Python lints cleanly — if `patches/` or `scripts/` (`.py`) changed
 - [ ] Shell scripts formatted — if `scripts/` (`.sh`) changed
 - [ ] Markdown lints cleanly — if any `.md` changed
-- [ ] Relevant documentation updated (README)
+- [ ] Relevant documentation updated
 
 ## Related issue
 
