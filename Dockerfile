@@ -37,11 +37,9 @@ RUN printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo \
 
 COPY --chmod=755 patches/argononed.py /etc/argon/argononed.py
 COPY --chmod=755 patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
+COPY --chmod=755 healthcheck.py /usr/local/bin/healthcheck
 
 HEALTHCHECK --interval=60s --timeout=5s --start-period=10s --retries=3 \
-  CMD python3 -c "\
-  t = int(open('/sys/class/thermal/thermal_zone0/temp').read()) / 1000; \
-  open('/dev/i2c-1'); \
-  print(f'cpu: {t:.1f}C')"
+  CMD healthcheck
 
 CMD ["/usr/bin/python3", "/etc/argon/argononed.py", "SERVICE"]

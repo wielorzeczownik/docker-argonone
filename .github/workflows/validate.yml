@@ -44,11 +44,23 @@ jobs:
           args: check
           src: patches/
 
+      - name: Lint healthcheck
+        uses: astral-sh/ruff-action@v4.0.0
+        with:
+          args: check
+          src: healthcheck.py
+
       - name: Format check scripts
         uses: astral-sh/ruff-action@v4.0.0
         with:
           args: format --check
           src: scripts/
+
+      - name: Format check healthcheck
+        uses: astral-sh/ruff-action@v4.0.0
+        with:
+          args: format --check
+          src: healthcheck.py
 
   smoke-build:
     name: Smoke build
