@@ -14,7 +14,6 @@ LABEL org.opencontainers.image.source="https://github.com/wielorzeczownik/docker
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Base tools for the Argon installer and daemon
 # hadolint ignore=DL3008
 RUN apt-get update \
   && apt-get install -y --no-install-recommends wget ca-certificates software-properties-common \
@@ -23,24 +22,21 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends python3-libgpiod python3-smbus \
   && rm -rf /var/lib/apt/lists/*
 
-# Stubs so argon1.sh installer runs without systemd or sudo in the image.
-# sudo: pass-through (we are already root); systemctl: no-op (daemon runs directly).
-RUN printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo && \
-  printf '#!/bin/sh\nexit 0\n'   > /usr/local/bin/systemctl && \
-  chmod +x /usr/local/bin/sudo /usr/local/bin/systemctl
-
-# Download and install Argon ONE from upstream script
-RUN wget -qO /tmp/argon1.sh "${ARGON_SCRIPT_URL}" \
+# Stubs so argon1.sh runs without systemd or sudo; install Argon ONE; purge build-time tools
+RUN printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo \
+  && printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/systemctl \
+  && chmod +x /usr/local/bin/sudo /usr/local/bin/systemctl \
+  && wget -qO /tmp/argon1.sh "${ARGON_SCRIPT_URL}" \
   && chmod +x /tmp/argon1.sh \
   && /tmp/argon1.sh \
   && rm /tmp/argon1.sh \
+  && apt-get purge -y wget software-properties-common \
+  && apt-get autoremove -y \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Patch daemon and config tool to respect low fan duty cycles without forced spin-up / 30% floor
-COPY patches/argononed.py /etc/argon/argononed.py
-COPY patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
-RUN chmod 755 /etc/argon/argononed.py /etc/argon/argonone-fanconfig.sh
+COPY --chmod=755 patches/argononed.py /etc/argon/argononed.py
+COPY --chmod=755 patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
 
 HEALTHCHECK --interval=60s --timeout=5s --start-period=10s --retries=3 \
   CMD python3 -c "\
