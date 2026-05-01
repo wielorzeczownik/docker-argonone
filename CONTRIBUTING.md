@@ -1,66 +1,61 @@
 # Contributing to docker-argonone
 
-Thank you for considering a contribution. This document describes how to get started.
+Thank you for considering a contribution. This document covers everything you need to get started.
 
-## Prerequisites
+## What this project is
 
-- Docker with Buildx
-- Python 3
-- [hadolint](https://github.com/hadolint/hadolint)
-- [shfmt](https://github.com/mvdan/sh)
-- [ruff](https://docs.astral.sh/ruff/)
-- [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2)
-- A Raspberry Pi or ARM device for testing (or QEMU for emulation)
+This project packages the [Argon ONE](https://www.argon40.com/) fan-control and power-button daemon as a Docker container. The upstream installer script (`argon1.sh`) is downloaded and run during the image build; two of its scripts are patched before shipping to remove artificial fan speed floors that make quiet profiles impossible. See [`patches/PATCHES.md`](patches/PATCHES.md) for the full list of changes and their rationale.
 
 ## Project structure
 
-- `Dockerfile` – container image definition
-- `patches/argononed.py` – patched Argon ONE daemon (derived from upstream)
-- `patches/argonone-fanconfig.sh` – patched fan configuration script (derived from upstream)
-- [`patches/PATCHES.md`](patches/PATCHES.md) – describes every change made to the upstream files and why
-- `patches/upstream.sha256` – SHA256 hashes of the upstream files the patches are based on
-- `scripts/check-upstream.py` – verifies that upstream files haven't changed
-- `scripts/update-upstream.py` – refreshes `patches/upstream.sha256` after updating patches
-- `scripts/resolve-version.sh` – determines the next release version from git-cliff output
+```text
+.
+├── Dockerfile                    image definition
+├── healthcheck.py                container healthcheck script
+├── requirements-test.txt         pinned test dependencies
+├── patches/
+│   ├── argononed.py              patched Argon ONE daemon (derived from upstream)
+│   ├── argonone-fanconfig.sh     patched fan config tool (derived from upstream)
+│   ├── PATCHES.md                documents every change and why
+│   └── upstream.sha256           SHA-256 hashes of the upstream files
+├── scripts/
+│   ├── check-upstream.py         verifies upstream files have not changed
+│   ├── update-upstream.py        refreshes upstream.sha256 after updating patches
+│   └── resolve-version.sh        determines next release version from git-cliff
+└── tests/
+    ├── conftest.py               mocks argon hardware modules for unit tests
+    └── test_argononed.py         unit tests for patched daemon logic
+```
 
-> The files in `patches/` are modifications of upstream files. Keep changes minimal and focused – do not reformat or restructure them beyond what is necessary for the fix.
+> Files in `patches/` are modifications of upstream files. Keep changes minimal and focused — do not reformat or restructure beyond what is necessary.
 
-## Updating patches
+## Development setup
 
-When the CI `upstream-drift` check fails, it means Argon ONE upstream has changed. To update the patches:
+```bash
+git clone https://github.com/wielorzeczownik/docker-argonone.git
+cd docker-argonone
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-test.txt
+```
 
-1. Download the new upstream files and review the diff against the current `patches/`:
-
-   ```bash
-   curl -fsSL https://download.argon40.com/scripts/argononed.py > /tmp/argononed.py
-   curl -fsSL https://download.argon40.com/scripts/argonone-fanconfig.sh > /tmp/argonone-fanconfig.sh
-   diff /tmp/argononed.py patches/argononed.py
-   diff /tmp/argonone-fanconfig.sh patches/argonone-fanconfig.sh
-   ```
-
-2. Re-apply the changes documented in [`patches/PATCHES.md`](patches/PATCHES.md) to the new upstream files.
-3. Refresh the stored hashes:
-
-   ```bash
-   python3 scripts/update-upstream.py
-   ```
-
-4. Commit both the updated patch files and `patches/upstream.sha256`.
-
-## Before submitting a PR
-
-Run all checks locally before opening a pull request.
+## Running checks locally
 
 ### With tools installed locally
 
 ```bash
+# Dockerfile
 hadolint Dockerfile
+
+# Python
 ruff check scripts/ patches/ tests/ healthcheck.py
 ruff format --check scripts/ healthcheck.py
+
+# Shell
 shfmt --diff scripts/
+
+# Markdown
 markdownlint-cli2 "**/*.md"
-pip install -r requirements-test.txt
-pytest tests/ -v
 ```
 
 ### With Docker (no local installs required)
@@ -76,18 +71,47 @@ docker run --rm -v "$(pwd):/src" -w /src mvdan/shfmt --diff scripts/
 docker run --rm -v "$(pwd):/workdir" davidanson/markdownlint-cli2 "**/*.md"
 ```
 
-The CI runs all of the above plus a Docker smoke build and a vulnerability scan of the resulting image.
+## Running tests
+
+The unit tests cover the patched daemon logic (`get_fanspeed`, `load_config`) without requiring real hardware. Hardware modules are mocked in `tests/conftest.py`.
+
+```bash
+source .venv/bin/activate
+pytest tests/ -v
+```
+
+## Updating patches
+
+When the CI `upstream-drift` check fails, the upstream Argon ONE scripts have changed. To update:
+
+1. Download the new upstream files and diff them against the current patches:
+
+   ```bash
+   curl -fsSL https://download.argon40.com/scripts/argononed.py > /tmp/argononed.py
+   curl -fsSL https://download.argon40.com/scripts/argonone-fanconfig.sh > /tmp/argonone-fanconfig.sh
+   diff /tmp/argononed.py patches/argononed.py
+   diff /tmp/argonone-fanconfig.sh patches/argonone-fanconfig.sh
+   ```
+
+2. Re-apply every change described in [`patches/PATCHES.md`](patches/PATCHES.md) to the new upstream files.
+
+3. Refresh the stored hashes:
+
+   ```bash
+   python3 scripts/update-upstream.py
+   ```
+
+4. Commit the updated patch files and `patches/upstream.sha256` together.
 
 ## Commit style
 
 This project uses [Conventional Commits](https://www.conventionalcommits.org/). Commit messages drive automatic changelog generation and version bumping.
 
-Common prefixes:
-
 | Prefix      | When to use                         |
 | ----------- | ----------------------------------- |
 | `feat:`     | New feature or behavior             |
 | `fix:`      | Bug fix                             |
+| `test:`     | Adding or updating tests            |
 | `chore:`    | Maintenance, dependency updates     |
 | `refactor:` | Code change without behavior change |
 | `docs:`     | Documentation only                  |
@@ -95,11 +119,13 @@ Common prefixes:
 
 Breaking changes must include `BREAKING CHANGE:` in the commit footer.
 
+Keep commits focused on a single concern. If a change touches both logic and tests, a single commit is fine — if it touches unrelated areas, split it.
+
 ## Pull requests
 
 - Keep PRs focused on a single concern.
 - Reference any related issue in the PR description.
-- All CI checks must pass: Dockerfile linting, Python linting, shell linting, Markdown linting, smoke build, and vulnerability scan.
+- All CI checks must pass before merging: Dockerfile linting, Python linting, shell formatting, Markdown linting, unit tests, smoke build, and vulnerability scan.
 
 ## Reporting bugs
 
@@ -112,7 +138,7 @@ Open an [issue](https://github.com/wielorzeczownik/docker-argonone/issues) and i
 - Docker version
 - Relevant container logs (`docker logs argonone`)
 
-> For security issues, please read [SECURITY.md](SECURITY.md) before opening a public issue.
+> For security issues, read [SECURITY.md](SECURITY.md) before opening a public issue.
 
 ## License
 
