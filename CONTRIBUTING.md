@@ -2,7 +2,7 @@
 
 Thank you for considering a contribution. This document covers everything you need to get started.
 
-## What this project is
+## Overview
 
 This project packages the [Argon ONE](https://www.argon40.com/) fan-control and power-button daemon as a Docker container. The upstream installer script (`argon1.sh`) is downloaded and run during the image build; two of its scripts are patched before shipping to remove artificial fan speed floors that make quiet profiles impossible. See [`patches/PATCHES.md`](patches/PATCHES.md) for the full list of changes and their rationale.
 
@@ -27,7 +27,7 @@ This project packages the [Argon ONE](https://www.argon40.com/) fan-control and 
     └── test_argononed.py         unit tests for patched daemon logic
 ```
 
-> Files in `patches/` are modifications of upstream files. Keep changes minimal and focused — do not reformat or restructure beyond what is necessary.
+> Files in `patches/` are modifications of upstream files. Keep changes minimal and focused – do not reformat or restructure beyond what is necessary.
 
 ## Development setup
 
@@ -119,7 +119,7 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/). 
 
 Breaking changes must include `BREAKING CHANGE:` in the commit footer.
 
-Keep commits focused on a single concern. If a change touches both logic and tests, a single commit is fine — if it touches unrelated areas, split it.
+Keep commits focused on a single concern. If a change touches both logic and tests, a single commit is fine – if it touches unrelated areas, split it.
 
 ## Pull requests
 
