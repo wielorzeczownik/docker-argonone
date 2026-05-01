@@ -17,7 +17,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Base tools for the Argon installer and daemon
 # hadolint ignore=DL3008
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends wget curl ca-certificates software-properties-common \
+  && apt-get install -y --no-install-recommends wget ca-certificates software-properties-common \
   && add-apt-repository -y universe \
   && apt-get update \
   && apt-get install -y --no-install-recommends python3-libgpiod python3-smbus \
@@ -30,7 +30,7 @@ RUN printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo && \
   chmod +x /usr/local/bin/sudo /usr/local/bin/systemctl
 
 # Download and install Argon ONE from upstream script
-RUN curl -fsSL "${ARGON_SCRIPT_URL}" -o /tmp/argon1.sh \
+RUN wget -qO /tmp/argon1.sh "${ARGON_SCRIPT_URL}" \
   && chmod +x /tmp/argon1.sh \
   && /tmp/argon1.sh \
   && rm /tmp/argon1.sh \
