@@ -44,6 +44,12 @@ jobs:
           args: check
           src: patches/
 
+      - name: Lint tests
+        uses: astral-sh/ruff-action@v4.0.0
+        with:
+          args: check
+          src: tests/
+
       - name: Lint healthcheck
         uses: astral-sh/ruff-action@v4.0.0
         with:
@@ -124,6 +130,22 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v23.0.0
         with:
           globs: "**/*.md"
+
+  pytest:
+    name: Pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: pip install -r requirements-test.txt
+
+      - name: Run tests
+        run: pytest tests/ -v
 
   upstream-drift:
     name: Upstream drift check
