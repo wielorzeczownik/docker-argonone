@@ -15,6 +15,7 @@ LABEL org.opencontainers.image.source="https://github.com/wielorzeczownik/docker
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Base tools for the Argon installer and daemon
+# hadolint ignore=DL3008
 RUN apt-get update \
   && apt-get install -y --no-install-recommends wget curl ca-certificates software-properties-common \
   && add-apt-repository -y universe \
