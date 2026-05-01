@@ -55,10 +55,12 @@ Run all checks locally before opening a pull request.
 
 ```bash
 hadolint Dockerfile
-ruff check scripts/ patches/
-ruff format --check scripts/
+ruff check scripts/ patches/ tests/ healthcheck.py
+ruff format --check scripts/ healthcheck.py
 shfmt --diff scripts/
 markdownlint-cli2 "**/*.md"
+pip install -r requirements-test.txt
+pytest tests/ -v
 ```
 
 ### With Docker (no local installs required)
@@ -66,8 +68,8 @@ markdownlint-cli2 "**/*.md"
 ```bash
 docker run --rm -v "$(pwd):/src" -w /src hadolint/hadolint hadolint Dockerfile
 
-docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff check scripts/ patches/
-docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff format --check scripts/
+docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff check scripts/ patches/ tests/ healthcheck.py
+docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff format --check scripts/ healthcheck.py
 
 docker run --rm -v "$(pwd):/src" -w /src mvdan/shfmt --diff scripts/
 
