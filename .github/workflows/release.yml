@@ -138,7 +138,7 @@ jobs:
           sbom: true
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v3.0.0
+        uses: softprops/action-gh-release@v3.0.1
         with:
           token: ${{ secrets.GH_RELEASE_TOKEN }}
           tag_name: ${{ needs.prepare-release.outputs.tag }}
