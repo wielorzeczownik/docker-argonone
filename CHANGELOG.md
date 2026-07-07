@@ -5,11 +5,16 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.7](https://github.com/wielorzeczownik/docker-argonone/compare/v2.0.6...v2.0.7) - 2026-07-07
 
 ### CI/CD
 
+- Generate cumulative CHANGELOG.md with a dedicated git-cliff config ([13d7973](https://github.com/wielorzeczownik/docker-argonone/commit/13d7973e43c34e970d1fa2ebf69ace40715f5f48))
 - Adopt strict ruff and mypy rules for scripts and tests ([72baba0](https://github.com/wielorzeczownik/docker-argonone/commit/72baba094c93652e89ae44dfb6cd30c985130533))
+
+### Dependencies
+
+- Update ubuntu:26.04 docker digest to b7f4819 ([f6a10ee](https://github.com/wielorzeczownik/docker-argonone/commit/f6a10ee707770018f7fb2340fe34fdcf3d437a2c))
 
 ## [2.0.6](https://github.com/wielorzeczownik/docker-argonone/compare/v2.0.5...v2.0.6) - 2026-06-27
 
