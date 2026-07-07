@@ -129,7 +129,9 @@ jobs:
       - name: Lint Markdown
         uses: DavidAnson/markdownlint-cli2-action@v23.2.0
         with:
-          globs: "**/*.md"
+          globs: |
+            **/*.md
+            !CHANGELOG.md
 
   mypy:
     name: Mypy

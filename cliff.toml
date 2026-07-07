@@ -1,60 +1,66 @@
+# Configuration for the cumulative CHANGELOG.md file.
+# Release-note generation and version bumping use cliff-release.toml.
+
 [changelog]
 header = """
+# Changelog
+
+All notable changes to this project are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 """
 body = """
-{% if version %}
-# Release Notes for Version {{ version }}
-
-**Release Date: {{ timestamp | date(format="%Y-%m-%d") }}**
-
-### What's Changed
-{% for group, grouped_commits in commits | group_by(attribute="group") %}
-{% if group != "Internal" %}
-#### {{ group }}
-{% for commit in grouped_commits %}
-- {% if remote.github.owner and remote.github.repo %}[{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}){% else %}{{ commit.id | truncate(length=7, end="") }}{% endif %} {{ commit.message | split(pat="\n") | first | trim }}
+{% if version -%}
+## [{{ version | trim_start_matches(pat="v") }}]\
+{%- if remote.github.owner and remote.github.repo and previous.version %}\
+(https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/compare/{{ previous.version }}...{{ version }})\
+{%- endif %} - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else -%}
+## [Unreleased]
+{% endif -%}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | striptags | trim | upper_first }}
+{% for commit in commits %}
+- {{ commit.message | split(pat="\n") | first | trim | upper_first }}\
+{%- if remote.github.owner and remote.github.repo %} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}))\
+{%- else %} ({{ commit.id | truncate(length=7, end="") }})\
+{%- endif %}
+{%- endfor %}
 {% endfor %}
-{% endif %}
-{% endfor %}
-{% if previous.version and remote.github.owner and remote.github.repo %}
-
----
-**Full Changelog:** [{{ previous.version }}...{{ version }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/compare/{{ previous.version }}...{{ version }})
-{% elif previous.version %}
-
----
-**Full Changelog:** {{ previous.version }}...{{ version }}
-{% endif %}
-{% endif %}
 """
+footer = ""
 trim = true
+postprocessors = [{ pattern = '(?m)^(## \[)', replace = "\n$1" }]
 
 [git]
 conventional_commits = true
-filter_unconventional = true
+filter_unconventional = false
 split_commits = false
 commit_parsers = [
-  { breaking = true, group = "Breaking Changes" },
-  { message = "^chore\\(release\\)", group = "Internal" },
-  { message = "^chore\\(deps\\)", group = "Dependencies" },
-  { message = "^chore", skip = true },
-  { message = "^ci", skip = true },
-  { message = "^refactor", group = "Refactoring" },
-  { message = "^test", skip = true },
-  { message = "^docs", skip = true },
-  { message = "^style", skip = true },
-  { message = "^build", skip = true },
-  { message = "^feat", group = "Features" },
-  { message = "^fix", group = "Bug Fixes" },
-  { message = "^perf", group = "Performance" },
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^Merge ", skip = true },
+  { breaking = true, group = "<!-- 01 -->Breaking Changes" },
+  { message = "^feat", group = "<!-- 02 -->Features" },
+  { message = "^fix", group = "<!-- 03 -->Bug Fixes" },
+  { message = "^perf", group = "<!-- 04 -->Performance" },
+  { message = "^refactor", group = "<!-- 05 -->Refactoring" },
+  { message = "^docs", group = "<!-- 06 -->Documentation" },
+  { message = "^test", group = "<!-- 07 -->Testing" },
+  { message = "^style", group = "<!-- 08 -->Styling" },
+  { message = "^build", group = "<!-- 09 -->Build System" },
+  { message = "^ci", group = "<!-- 10 -->CI/CD" },
+  { message = "^chore\\(deps\\)", group = "<!-- 11 -->Dependencies" },
+  { message = "^chore", group = "<!-- 12 -->Miscellaneous" },
+  { message = ".*", group = "<!-- 13 -->Other" },
 ]
 protect_breaking_commits = true
-filter_commits = true
+filter_commits = false
 tag_pattern = "v[0-9]*"
 skip_tags = "v0.0.0"
 ignore_tags = ""
 topo_order = false
-sort_commits = "oldest"
+sort_commits = "newest"
 
 [bump]
 features_always_bump_minor = true
