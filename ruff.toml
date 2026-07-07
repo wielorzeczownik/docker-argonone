@@ -1,12 +1,33 @@
 line-length = 80
 target-version = "py312"
 src = ["scripts"]
-extend-exclude = [".git", ".mypy_cache", ".ruff_cache", ".venv", "patches"]
+extend-exclude = [
+  ".git",
+  ".mypy_cache",
+  ".pytest_cache",
+  ".ruff_cache",
+  ".venv",
+  "patches",
+]
 
 [lint]
-select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4"]
-ignore = ["E501", "E722"]
+select = ["ALL"]
+ignore = [
+  "E501",             # line length is enforced by the formatter
+  "D",                # docstrings are not mandated
+  "ANN401",           # allow explicit typing.Any where needed
+  "COM812",           # conflicts with the formatter
+  "ISC001",           # conflicts with the formatter
+  "TRY003",           # long messages inside raise
+  "EM101", "EM102",   # string literals in exceptions
+  "PLR0913",          # too many arguments
+  "PLR2004",          # magic value comparisons
+  "FBT001", "FBT002", # boolean positional args
+]
 fixable = ["ALL"]
+
+[lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "ANN", "SLF001", "ARG"]
 
 [format]
 quote-style = "double"

@@ -1,5 +1,6 @@
 import importlib.util
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 
@@ -20,7 +21,7 @@ class TestGetFanspeed:
     Both mean the configured duty cycle must be returned exactly.
     """
 
-    CONFIG = [" 65.0=100", " 60.0=55", " 55.0=30"]
+    CONFIG: ClassVar[list[str]] = [" 65.0=100", " 60.0=55", " 55.0=30"]
 
     def test_above_highest_threshold(self):
         assert get_fanspeed(70, self.CONFIG) == 100

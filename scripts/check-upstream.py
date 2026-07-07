@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: S310, T201  # CI helper: fetches pinned upstream URLs, prints to stdout
 
 import hashlib
 import sys

@@ -50,6 +50,7 @@ hadolint Dockerfile
 # Python
 ruff check scripts/ patches/ tests/ healthcheck.py
 ruff format --check scripts/ healthcheck.py
+mypy scripts/ healthcheck.py
 
 # Shell
 shfmt --diff scripts/
@@ -65,6 +66,8 @@ docker run --rm -v "$(pwd):/src" -w /src hadolint/hadolint hadolint Dockerfile
 
 docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff check scripts/ patches/ tests/ healthcheck.py
 docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff format --check scripts/ healthcheck.py
+
+docker run --rm -v "$(pwd):/src" -w /src python:3.12 sh -c "pip install -q -r requirements-lint.txt && mypy scripts/ healthcheck.py"
 
 docker run --rm -v "$(pwd):/src" -w /src mvdan/shfmt --diff scripts/
 
@@ -125,7 +128,7 @@ Keep commits focused on a single concern. If a change touches both logic and tes
 
 - Keep PRs focused on a single concern.
 - Reference any related issue in the PR description.
-- All CI checks must pass before merging: Dockerfile linting, Python linting, shell formatting, Markdown linting, unit tests, smoke build, and vulnerability scan.
+- All CI checks must pass before merging: Dockerfile linting, Python linting, type checking (mypy), shell formatting, Markdown linting, unit tests, smoke build, and vulnerability scan.
 
 ## Reporting bugs
 
