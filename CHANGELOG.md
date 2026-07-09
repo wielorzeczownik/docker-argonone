@@ -5,6 +5,25 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0](https://github.com/wielorzeczownik/docker-argonone/compare/v2.0.7...v2.1.0) - 2026-07-09
+
+### Features
+
+- Add systemd image variant for power-button support ([28fab51](https://github.com/wielorzeczownik/docker-argonone/commit/28fab5117d5e6a16d50d9e1230b2e35628954c5a))
+
+### Documentation
+
+- Document the Standard and systemd image variants ([881cc0b](https://github.com/wielorzeczownik/docker-argonone/commit/881cc0ba1b54b962a7f654d1ac56a6e083ed9c02))
+
+### CI/CD
+
+- Update docker/login-action action to v4.3.0 ([569eded](https://github.com/wielorzeczownik/docker-argonone/commit/569eded2bf8807ed12ff1fbd00da5fc1c95457c0))
+- Update docker actions ([8ef06c2](https://github.com/wielorzeczownik/docker-argonone/commit/8ef06c249da5100a025bb10475558a142ce61892))
+
+### Miscellaneous
+
+- Add image-variant field to the bug report template ([d4ab083](https://github.com/wielorzeczownik/docker-argonone/commit/d4ab083c0432378d36a0f51e50e22e831e96c2ae))
+
 ## [2.0.7](https://github.com/wielorzeczownik/docker-argonone/compare/v2.0.6...v2.0.7) - 2026-07-07
 
 ### CI/CD
