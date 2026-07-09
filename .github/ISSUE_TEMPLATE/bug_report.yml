@@ -52,6 +52,17 @@ body:
       label: Image version
       placeholder: "e.g. latest, v1.2.0"
 
+  - type: dropdown
+    id: variant
+    attributes:
+      label: Image variant
+      description: Standard runs the daemon directly; systemd runs with `--privileged` for power-button support.
+      options:
+        - Standard (latest / <version>)
+        - systemd (systemd / <version>-systemd)
+    validations:
+      required: true
+
   - type: textarea
     id: logs
     attributes:
