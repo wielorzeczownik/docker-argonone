@@ -18,8 +18,19 @@ Dockerized Argon ONE fan-control and power-button driver for Raspberry Pi 4 and 
 > - `argononed.py` – daemon respects low PWM duty cycles (<25%) without a forced 100% spin-up; logs CPU temperature and fan speed to `docker logs`,
 > - `argonone-fanconfig.sh` – fan config accepts 0-100% duty cycle (no 30% floor).
 
-> [!NOTE]
-> Power button support (shutdown/reboot) was available up to v1.0.7 when the container ran systemd. From v2.0.0 the daemon runs directly as PID 1 – fan control works fully, but the power button no longer triggers an OS shutdown.
+## Variants
+
+Two images are published from the same daemon and patches. Pick based on whether you need the power button.
+
+| Variant                | Docker image                       | Container access        | Power button             |
+| ---------------------- | ---------------------------------- | ----------------------- | ------------------------ |
+| **Standard** (default) | `wielorzeczownik/argonone:latest`  | `--device` (I2C + GPIO) | ❌ fan control only      |
+| **systemd**            | `wielorzeczownik/argonone:systemd` | `--privileged`          | ✅ shutdown/reboot works |
+
+Fan control is identical in both. The **Standard** image runs the daemon directly as PID 1 and only needs the two device nodes. The **systemd** image runs systemd as PID 1 so the Argon ONE power button can trigger an OS shutdown/reboot, at the cost of requiring `--privileged`.
+
+> [!WARNING]
+> The systemd variant runs with `--privileged`, granting the container broad host access. Use the Standard image unless you specifically need power-button shutdown.
 
 ## Run
 
@@ -81,6 +92,39 @@ docker run -d \
 ```
 
 The same image works for both RPi 4 and RPi 5 – the Argon ONE installer auto-detects the board model from `/proc/cpuinfo`, which is passed through from the host in Docker.
+
+## systemd variant (power button)
+
+To use the power button for OS shutdown/reboot, run the `:systemd` image with `--privileged`. The device nodes and the Raspberry Pi 5 note above still apply – only the tag and `--privileged` change.
+
+### Docker Compose (systemd)
+
+```yaml
+services:
+  argonone:
+    image: wielorzeczownik/argonone:systemd
+    container_name: argonone
+    restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/i2c-1:/dev/i2c-1
+      - /dev/gpiochip0:/dev/gpiochip0
+    volumes:
+      - ./argononed.conf:/etc/argononed.conf:ro
+```
+
+### Docker Run (systemd)
+
+```bash
+docker run -d \
+  --name argonone \
+  --restart unless-stopped \
+  --privileged \
+  --device /dev/i2c-1:/dev/i2c-1 \
+  --device /dev/gpiochip0:/dev/gpiochip0 \
+  -v $(pwd)/argononed.conf:/etc/argononed.conf:ro \
+  wielorzeczownik/argonone:systemd
+```
 
 ## Fan configuration
 

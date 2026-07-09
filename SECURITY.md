@@ -25,11 +25,13 @@ This project runs a Docker container with direct access to hardware devices. The
 
 - The container accesses `/dev/i2c-1` (fan/MCU communication) and `/dev/gpiochip0` or `/dev/gpiochip4` (power button GPIO)
 - The daemon communicates with hardware via I2C
-- The daemon runs as root (PID 1) inside the container
+- The daemon runs as root (PID 1 in the Standard image; supervised by systemd in the systemd image)
+- The **systemd** image variant runs with `--privileged` (broad host access) to enable power-button shutdown; the default **Standard** image does not
 
 Issues related to the upstream Argon ONE daemon or the original scripts are out of scope.
 
 ## Security notes
 
-- The container does not require `--privileged`; grant only the specific device nodes it needs.
+- Prefer the **Standard** image: it does not require `--privileged`; grant only the specific device nodes it needs.
+- The **systemd** image requires `--privileged` and therefore has broad host access — use it only if you need power-button shutdown.
 - Keep the base image up to date.
