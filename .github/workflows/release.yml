@@ -128,6 +128,8 @@ jobs:
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v6.2.0
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
         with:
           images: |
             ghcr.io/${{ github.repository }}
@@ -135,6 +137,8 @@ jobs:
           tags: |
             type=raw,value=${{ needs.prepare-release.outputs.version }}
             type=raw,value=latest
+          labels: |
+            org.opencontainers.image.description=Dockerized Argon ONE fan-control and power-button driver for non-Raspberry Pi OS distributions
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v7.3.0
@@ -144,6 +148,7 @@ jobs:
           platforms: linux/arm/v7,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: true
@@ -152,6 +157,8 @@ jobs:
       - name: Extract Docker metadata (systemd variant)
         id: meta-systemd
         uses: docker/metadata-action@v6.2.0
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
         with:
           images: |
             ghcr.io/${{ github.repository }}
@@ -159,6 +166,8 @@ jobs:
           tags: |
             type=raw,value=${{ needs.prepare-release.outputs.version }}-systemd
             type=raw,value=systemd
+          labels: |
+            org.opencontainers.image.description=Argon ONE fan-control and power-button driver (systemd variant, requires --privileged)
 
       - name: Build and push Docker image (systemd variant)
         uses: docker/build-push-action@v7.3.0
@@ -169,6 +178,7 @@ jobs:
           platforms: linux/arm/v7,linux/arm64
           tags: ${{ steps.meta-systemd.outputs.tags }}
           labels: ${{ steps.meta-systemd.outputs.labels }}
+          annotations: ${{ steps.meta-systemd.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: true
