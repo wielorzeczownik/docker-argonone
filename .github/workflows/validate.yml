@@ -11,6 +11,9 @@ jobs:
     name: Hadolint
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      matrix:
+        dockerfile: [Dockerfile, Dockerfile.systemd]
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.0
@@ -20,7 +23,7 @@ jobs:
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.3.0
         with:
-          dockerfile: Dockerfile
+          dockerfile: ${{ matrix.dockerfile }}
 
   ruff:
     name: Ruff
@@ -72,6 +75,13 @@ jobs:
     name: Smoke build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      matrix:
+        include:
+          - dockerfile: Dockerfile
+            tag: argonone:test
+          - dockerfile: Dockerfile.systemd
+            tag: argonone:test-systemd
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.0
@@ -85,16 +95,17 @@ jobs:
         uses: docker/build-push-action@v7.3.0
         with:
           context: .
+          file: ${{ matrix.dockerfile }}
           push: false
           load: true
-          tags: argonone:test
+          tags: ${{ matrix.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Scan image for vulnerabilities
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: argonone:test
+          image-ref: ${{ matrix.tag }}
           format: table
           exit-code: "1"
           severity: CRITICAL,HIGH

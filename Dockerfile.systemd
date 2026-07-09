@@ -1,0 +1,47 @@
+FROM ubuntu:26.04@sha256:b7f48194d4d8b763a478a621cdc81c27be222ba2206ca3ca6bc42b49685f3d9e
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ARG ARGON_SCRIPT_URL=https://download.argon40.com/argon1.sh
+
+LABEL org.opencontainers.image.source="https://github.com/wielorzeczownik/docker-argonone" \
+  org.opencontainers.image.url="https://github.com/wielorzeczownik/docker-argonone" \
+  org.opencontainers.image.documentation="https://github.com/wielorzeczownik/docker-argonone#readme" \
+  org.opencontainers.image.title="docker-argonone" \
+  org.opencontainers.image.description="Argon ONE fan-control and power-button driver (systemd variant, requires --privileged)" \
+  org.opencontainers.image.authors="wielorzeczownik" \
+  org.opencontainers.image.vendor="wielorzeczownik"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# hadolint ignore=DL3008
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends sudo systemd wget ca-certificates software-properties-common \
+  && add-apt-repository -y universe \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends python3-libgpiod python3-smbus \
+  && rm -rf /var/lib/apt/lists/*
+
+# Tune systemd for a container (drop timers, multi-user target, journal to stdout),
+# install Argon ONE, enable the daemon service, purge build-time tools
+RUN find /etc/systemd -name '*.timer' -print0 | xargs -0 rm -v || true \
+  && systemctl set-default multi-user.target \
+  && printf '[Journal]\nForwardToConsole=yes\n' >> /etc/systemd/journald.conf \
+  && wget -qO /tmp/argon1.sh "${ARGON_SCRIPT_URL}" \
+  && chmod +x /tmp/argon1.sh \
+  && /tmp/argon1.sh \
+  && rm /tmp/argon1.sh \
+  && systemctl enable argononed \
+  && apt-get purge -y wget software-properties-common \
+  && apt-get autoremove -y \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY --chmod=755 patches/argononed.py /etc/argon/argononed.py
+COPY --chmod=755 patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
+COPY --chmod=755 healthcheck.py /usr/local/bin/healthcheck
+
+HEALTHCHECK --interval=60s --timeout=5s --start-period=10s --retries=3 \
+  CMD healthcheck
+
+CMD ["/lib/systemd/systemd"]

@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - "Dockerfile"
+      - "Dockerfile.systemd"
       - "patches/**"
 
 permissions: {}
@@ -143,6 +144,31 @@ jobs:
           platforms: linux/arm/v7,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+
+      - name: Extract Docker metadata (systemd variant)
+        id: meta-systemd
+        uses: docker/metadata-action@v6.1.0
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+            docker.io/${{ secrets.DOCKERHUB_USERNAME || github.repository_owner }}/argonone
+          tags: |
+            type=raw,value=${{ needs.prepare-release.outputs.version }}-systemd
+            type=raw,value=systemd
+
+      - name: Build and push Docker image (systemd variant)
+        uses: docker/build-push-action@v7.3.0
+        with:
+          context: .
+          file: Dockerfile.systemd
+          push: true
+          platforms: linux/arm/v7,linux/arm64
+          tags: ${{ steps.meta-systemd.outputs.tags }}
+          labels: ${{ steps.meta-systemd.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: true
