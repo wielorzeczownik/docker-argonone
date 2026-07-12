@@ -36,37 +36,37 @@ jobs:
           persist-credentials: false
 
       - name: Lint scripts
-        uses: astral-sh/ruff-action@v4.0.0
+        uses: astral-sh/ruff-action@v4.1.0
         with:
           args: check
           src: scripts/
 
       - name: Lint patches
-        uses: astral-sh/ruff-action@v4.0.0
+        uses: astral-sh/ruff-action@v4.1.0
         with:
           args: check
           src: patches/
 
       - name: Lint tests
-        uses: astral-sh/ruff-action@v4.0.0
+        uses: astral-sh/ruff-action@v4.1.0
         with:
           args: check
           src: tests/
 
       - name: Lint healthcheck
-        uses: astral-sh/ruff-action@v4.0.0
+        uses: astral-sh/ruff-action@v4.1.0
         with:
           args: check
           src: healthcheck.py
 
       - name: Format check scripts
-        uses: astral-sh/ruff-action@v4.0.0
+        uses: astral-sh/ruff-action@v4.1.0
         with:
           args: format --check
           src: scripts/
 
       - name: Format check healthcheck
-        uses: astral-sh/ruff-action@v4.0.0
+        uses: astral-sh/ruff-action@v4.1.0
         with:
           args: format --check
           src: healthcheck.py
