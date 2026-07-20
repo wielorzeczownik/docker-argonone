@@ -5,6 +5,26 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.0...v2.1.1) - 2026-07-20
+
+### Performance
+
+- Compress logo from 1.4 MB to 64 KB ([bb5ba14](https://github.com/wielorzeczownik/docker-argonone/commit/bb5ba14c8be849ee471af01d4afa27125b8fe996))
+
+### CI/CD
+
+- Update astral-sh/ruff-action action to v4.1.0 ([1cc6965](https://github.com/wielorzeczownik/docker-argonone/commit/1cc6965511db6a291a070fcfc907b86b38220a80))
+- Update docker/login-action action to v4.4.0 ([9415c28](https://github.com/wielorzeczownik/docker-argonone/commit/9415c28bc2be43d7365d119f261b02435045bda0))
+- Update davidanson/markdownlint-cli2-action action to v24 ([7a53129](https://github.com/wielorzeczownik/docker-argonone/commit/7a53129b140e3387768d23ee4562a2fd1d7ad7d4))
+- Set OCI image description on multi-arch manifests ([5e76f79](https://github.com/wielorzeczownik/docker-argonone/commit/5e76f7905b28a822e04591836fd590e86a8b9732))
+- Update docker actions ([a7298b7](https://github.com/wielorzeczownik/docker-argonone/commit/a7298b7ee653c93d3ebaa65447203ce3977ace76))
+
+### Dependencies
+
+- Update ubuntu:26.04 docker digest to 3131b4c ([0932518](https://github.com/wielorzeczownik/docker-argonone/commit/093251839943ea2a1d3e5040d6fd3214327d718b))
+- Update dependency mypy to v2.3.0 ([19208f3](https://github.com/wielorzeczownik/docker-argonone/commit/19208f3f70e9f5165ae4f424330ab71cac77bba0))
+- Update dependency mypy to v2.2.0 ([298051d](https://github.com/wielorzeczownik/docker-argonone/commit/298051d9a2a490317f80c72588c504e25639890d))
+
 ## [2.1.0](https://github.com/wielorzeczownik/docker-argonone/compare/v2.0.7...v2.1.0) - 2026-07-09
 
 ### Features
