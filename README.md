@@ -126,6 +126,29 @@ docker run -d \
   wielorzeczownik/argonone:systemd
 ```
 
+## Configuration
+
+### Runtime inputs
+
+| Input                 | Required             | Default              | Meaning                                                                      |
+| --------------------- | -------------------- | -------------------- | ---------------------------------------------------------------------------- |
+| `/dev/i2c-1`          | yes                  | –                    | I2C bus the Argon ONE MCU sits on. The daemon exits without it.              |
+| `/dev/gpiochip0`      | for the power button | –                    | GPIO chip carrying the power-button line on Raspberry Pi 4 and earlier.      |
+| `/dev/gpiochip4`      | for the power button | –                    | GPIO chip on Raspberry Pi 5, where the lines moved to the RP1 I/O chip.      |
+| `/etc/argononed.conf` | no                   | 55=10, 60=55, 65=100 | Temperature-to-fan-speed map. Mount read-only; see the table below.          |
+| `--privileged`        | systemd variant only | off                  | Required by the `:systemd` image so the power button can shut the host down. |
+
+The image reads no environment variables. Everything it needs comes from the
+device nodes and the mounted config file.
+
+### Build arguments
+
+Only relevant if you build the image yourself.
+
+| Argument           | Required | Default                                  | Meaning                                                |
+| ------------------ | -------- | ---------------------------------------- | ------------------------------------------------------ |
+| `ARGON_SCRIPT_URL` | no       | `https://download.argon40.com/argon1.sh` | Upstream Argon ONE installer fetched during the build. |
+
 ## Fan configuration
 
 `/etc/argononed.conf` maps temperature thresholds (°C) to fan speed percentages. Default template:
