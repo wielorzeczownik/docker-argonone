@@ -22,12 +22,13 @@ ignore = [
   "EM101", "EM102",   # string literals in exceptions
   "PLR0913",          # too many arguments
   "PLR2004",          # magic value comparisons
+  "CPY001",           # per-file copyright headers (LICENSE covers the repo)
   "FBT001", "FBT002", # boolean positional args
 ]
 fixable = ["ALL"]
 
 [lint.per-file-ignores]
-"tests/**" = ["S101", "PLR2004", "ANN", "SLF001", "ARG"]
+"tests/**" = ["S101"]
 
 [format]
 quote-style = "double"
