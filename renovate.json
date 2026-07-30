@@ -1,25 +1,76 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["group:monorepos", "group:recommended"],
   "platformAutomerge": true,
   "automergeType": "pr",
   "semanticCommits": "enabled",
   "minimumReleaseAge": "3 days",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Track the prettier version pinned in workflow run steps",
+      "fileMatch": ["^\\.github/workflows/[^/]+\\.yml$"],
+      "matchStrings": ["prettier@(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "prettier",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "Track python tools pinned inline in workflow run steps",
+      "fileMatch": ["^\\.github/workflows/[^/]+\\.yml$"],
+      "matchStrings": [
+        "pip install (?<depName>[a-z0-9-]+)==(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "pypi"
+    },
+    {
+      "customType": "regex",
+      "description": "Track tool versions annotated with a renovate comment",
+      "fileMatch": ["^\\.github/workflows/[^/]+\\.yml$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)\\s+version: (?<currentValue>\\S+)"
+      ],
+      "versioningTemplate": "semver"
+    }
+  ],
   "packageRules": [
     {
+      "description": "Majors stay manual, everything else merges once it has soaked",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
     },
     {
+      "description": "Actions are pinned to a commit SHA; the soak period is what catches a compromised release, so it is longer than the default",
       "matchManagers": ["github-actions"],
+      "pinDigests": true,
       "minimumReleaseAge": "7 days",
       "semanticCommitType": "ci"
     },
     {
+      "description": "One pull request for every non-major action update",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "github actions"
+    },
+    {
+      "description": "Base images carry a tag plus digest so rebuilding a tag uses the same layers",
       "matchManagers": ["dockerfile"],
       "pinDigests": true,
       "semanticCommitType": "chore"
     },
     {
+      "description": "Dockerfile and Dockerfile.systemd share one base image and must not drift apart",
+      "matchManagers": ["dockerfile"],
+      "matchPackageNames": ["ubuntu"],
+      "groupName": "ubuntu base image"
+    },
+    {
+      "description": "ruff, mypy and pytest are pinned together so a lint bump cannot land without its formatter",
+      "matchManagers": ["pip_requirements"],
+      "groupName": "python tooling"
+    },
+    {
+      "description": "The docker/* actions share a release cadence and are used as a set",
       "matchManagers": ["github-actions"],
       "matchPackageNames": [
         "docker/build-push-action",
@@ -31,6 +82,7 @@
       "groupName": "docker actions"
     },
     {
+      "description": "upload-artifact and download-artifact must stay on compatible majors",
       "matchManagers": ["github-actions"],
       "matchPackageNames": [
         "actions/upload-artifact",

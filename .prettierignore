@@ -1,0 +1,9 @@
+.idea/
+.vscode/
+.DS_Store
+
+CHANGELOG.md
+patches/
+
+.github/upstream-drift-issue.md
+.github/security-advisory-issue.md

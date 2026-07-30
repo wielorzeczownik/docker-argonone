@@ -7,17 +7,20 @@ on:
     paths:
       - "Dockerfile"
       - "Dockerfile.systemd"
+      - ".dockerignore"
+      - "healthcheck.py"
       - "patches/**"
 
 permissions: {}
 
 concurrency:
   group: release-master
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   prepare-release:
-    runs-on: ubuntu-latest
+    name: Prepare release
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: write
@@ -27,13 +30,13 @@ jobs:
       tag: ${{ steps.bump.outputs.tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Determine next version (git-cliff)
         id: cliff_bumped
-        uses: orhun/git-cliff-action@v4.8.0
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
         with:
           config: cliff-release.toml
           args: --bumped-version
@@ -50,7 +53,7 @@ jobs:
 
       - name: Generate release notes (git-cliff)
         if: ${{ steps.bump.outputs.released == 'true' }}
-        uses: orhun/git-cliff-action@v4.8.0
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
         with:
           config: cliff-release.toml
           args: --unreleased --tag ${{ steps.bump.outputs.tag }}
@@ -60,7 +63,7 @@ jobs:
 
       - name: Generate CHANGELOG.md (git-cliff)
         if: ${{ steps.bump.outputs.released == 'true' }}
-        uses: orhun/git-cliff-action@v4.8.0
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
         with:
           config: cliff.toml
           args: --tag ${{ steps.bump.outputs.tag }}
@@ -70,7 +73,7 @@ jobs:
 
       - name: Commit changelog, tag, and push
         if: ${{ steps.bump.outputs.released == 'true' }}
-        uses: EndBug/add-and-commit@v10.0.0
+        uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10.0.0
         with:
           add: CHANGELOG.md
           default_author: github_actions
@@ -80,54 +83,57 @@ jobs:
 
       - name: Upload release notes
         if: ${{ steps.bump.outputs.released == 'true' }}
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-notes
           path: release-notes.md
 
   publish:
+    name: Publish images and release
     needs: prepare-release
     if: ${{ needs.prepare-release.outputs.released == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
       contents: write
       packages: write
+      attestations: write
+      id-token: write
     steps:
       - name: Checkout tag
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.prepare-release.outputs.tag }}
           persist-credentials: false
 
       - name: Download release notes
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: release-notes
           path: .
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4.2.0
+        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4.2.0
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v4.4.0
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME || github.repository_owner }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v4.4.0
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_RELEASE_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v6.2.0
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
         with:
@@ -141,7 +147,8 @@ jobs:
             org.opencontainers.image.description=Dockerized Argon ONE fan-control and power-button driver for non-Raspberry Pi OS distributions
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v7.3.0
+        id: build
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           push: true
@@ -154,9 +161,16 @@ jobs:
           provenance: true
           sbom: true
 
+      - name: Attest image provenance
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
       - name: Extract Docker metadata (systemd variant)
         id: meta-systemd
-        uses: docker/metadata-action@v6.2.0
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
         with:
@@ -170,7 +184,8 @@ jobs:
             org.opencontainers.image.description=Argon ONE fan-control and power-button driver (systemd variant, requires --privileged)
 
       - name: Build and push Docker image (systemd variant)
-        uses: docker/build-push-action@v7.3.0
+        id: build-systemd
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           file: Dockerfile.systemd
@@ -184,10 +199,16 @@ jobs:
           provenance: true
           sbom: true
 
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v3.0.2
+      - name: Attest image provenance (systemd variant)
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
         with:
-          token: ${{ secrets.GH_RELEASE_TOKEN }}
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.build-systemd.outputs.digest }}
+          push-to-registry: true
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
+        with:
           tag_name: ${{ needs.prepare-release.outputs.tag }}
           name: ${{ needs.prepare-release.outputs.tag }}
           body_path: release-notes.md
