@@ -76,9 +76,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           AUDIT_REPORT: ${{ steps.audit.outputs.report }}
-          REPO_OWNER: ${{ github.repository_owner }}
         with:
           filename: .github/security-advisory-issue.md
+          assignees: ${{ github.repository_owner }}
           search_existing: open
           update_existing: true
 
@@ -121,9 +121,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           DRIFT_REPORT: ${{ steps.drift.outputs.report }}
-          REPO_OWNER: ${{ github.repository_owner }}
         with:
           filename: .github/upstream-drift-issue.md
+          assignees: ${{ github.repository_owner }}
           search_existing: open
           update_existing: true
 

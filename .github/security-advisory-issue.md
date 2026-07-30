@@ -1,7 +1,6 @@
 ---
 title: Unresolved security advisories
 labels: security-advisory
-assignees: {{ env.REPO_OWNER }}
 ---
 
 `pip-audit` or the Trivy scan of the published images reports advisories that
