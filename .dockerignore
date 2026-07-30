@@ -1,11 +1,17 @@
 .git/
 .github/
 .venv/
+scripts/
+tests/
 
 *.md
 *.toml
+*.txt
 *.json
+*.ini
 
+.dockerignore
 .editorconfig
 .gitignore
-.prettierrc.json
+.prettierrc
+.prettierignore
