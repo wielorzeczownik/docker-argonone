@@ -1,0 +1,139 @@
+name: Audit
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: audit
+  cancel-in-progress: false
+
+jobs:
+  vulnerabilities:
+    name: Audit dependencies and published images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install pip-audit
+        run: pip install pip-audit==2.10.1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Scan published image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:latest
+          format: json
+          output: trivy-latest.json
+          exit-code: "0"
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Scan published image (systemd variant)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:systemd
+          format: json
+          output: trivy-systemd.json
+          exit-code: "0"
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Aggregate findings
+        id: audit
+        shell: bash
+        run: bash scripts/security-audit.sh latest=trivy-latest.json systemd=trivy-systemd.json
+
+      - name: Create issue
+        if: ${{ steps.audit.outputs.unresolved == 'true' }}
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          AUDIT_REPORT: ${{ steps.audit.outputs.report }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        with:
+          filename: .github/security-advisory-issue.md
+          search_existing: open
+          update_existing: true
+
+      - name: Find advisory issue
+        id: advisory_issue
+        if: ${{ steps.audit.outputs.unresolved == 'false' }}
+        uses: micalevisk/last-issue-action@0d40124cc99ac8601c2516007f0c98ef3d27537b # v2.3.0
+        with:
+          labels: security-advisory
+          state: open
+
+      - name: Close advisory issue
+        if: ${{ steps.audit.outputs.unresolved == 'false' && steps.advisory_issue.outputs.has-found == 'true' }}
+        uses: peter-evans/close-issue@05dff7ca07116e5707cfb3a3cd4af7bb5e43524c # v3.0.2
+        with:
+          issue-number: ${{ steps.advisory_issue.outputs.issue-number }}
+          comment: "`pip-audit` and the image scan no longer report advisories."
+
+  upstream:
+    name: Audit upstream drift
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check upstream file hashes
+        id: drift
+        shell: bash
+        run: bash scripts/upstream-drift.sh
+
+      - name: Create issue
+        if: ${{ steps.drift.outputs.unresolved == 'true' }}
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DRIFT_REPORT: ${{ steps.drift.outputs.report }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        with:
+          filename: .github/upstream-drift-issue.md
+          search_existing: open
+          update_existing: true
+
+      - name: Find drift issue
+        id: drift_issue
+        if: ${{ steps.drift.outputs.unresolved == 'false' }}
+        uses: micalevisk/last-issue-action@0d40124cc99ac8601c2516007f0c98ef3d27537b # v2.3.0
+        with:
+          labels: upstream-drift
+          state: open
+
+      - name: Close drift issue
+        if: ${{ steps.drift.outputs.unresolved == 'false' && steps.drift_issue.outputs.has-found == 'true' }}
+        uses: peter-evans/close-issue@05dff7ca07116e5707cfb3a3cd4af7bb5e43524c # v3.0.2
+        with:
+          issue-number: ${{ steps.drift_issue.outputs.issue-number }}
+          comment: "Upstream files match `patches/upstream.sha256` again."
