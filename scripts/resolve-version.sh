@@ -8,6 +8,7 @@ emit() {
     echo "released=$1"
     echo "version=${2#v}"
     echo "tag=$2"
+    echo "commit_changes=$3"
   } >>"$GITHUB_OUTPUT"
 }
 
@@ -22,14 +23,14 @@ fi
 
 if [[ -n "$last_tag" && "$next_tag" == "$last_tag" ]]; then
   echo "No user-facing commits since ${last_tag}. Nothing to release."
-  emit false "$last_tag"
+  emit false "$last_tag" false
   exit 0
 fi
 
 if [[ -n "$last_tag" && "$(printf '%s\n' "${last_tag#v}" "${next_tag#v}" | sort -V | tail -1)" != "${next_tag#v}" ]]; then
   echo "git-cliff returned $next_tag which is lower than current $last_tag. Nothing to release."
-  emit false "$last_tag"
+  emit false "$last_tag" false
   exit 0
 fi
 
-emit true "$next_tag"
+emit true "$next_tag" true
