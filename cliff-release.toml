@@ -13,12 +13,10 @@ body = """
 
 ### What's Changed
 {% for group, grouped_commits in commits | group_by(attribute="group") %}
-{% if group != "Internal" %}
 #### {{ group }}
 {% for commit in grouped_commits %}
 - {% if remote.github.owner and remote.github.repo %}[{{ commit.id | truncate(length=7, end="") }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}){% else %}{{ commit.id | truncate(length=7, end="") }}{% endif %} {{ commit.message | split(pat="\n") | first | trim }}
 {% endfor %}
-{% endif %}
 {% endfor %}
 {% if previous.version and remote.github.owner and remote.github.repo %}
 
@@ -38,19 +36,20 @@ conventional_commits = true
 filter_unconventional = true
 split_commits = false
 commit_parsers = [
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^Merge ", skip = true },
   { breaking = true, group = "Breaking Changes" },
-  { message = "^chore\\(release\\)", group = "Internal" },
-  { message = "^chore\\(deps\\)", group = "Dependencies" },
-  { message = "^chore", skip = true },
-  { message = "^ci", skip = true },
-  { message = "^refactor", group = "Refactoring" },
-  { message = "^test", skip = true },
-  { message = "^docs", skip = true },
-  { message = "^style", skip = true },
-  { message = "^build", skip = true },
   { message = "^feat", group = "Features" },
   { message = "^fix", group = "Bug Fixes" },
   { message = "^perf", group = "Performance" },
+  { message = "^refactor", group = "Refactoring" },
+  { message = "^chore\\(deps\\)", group = "Dependencies" },
+  { message = "^docs", skip = true },
+  { message = "^test", skip = true },
+  { message = "^style", skip = true },
+  { message = "^build", skip = true },
+  { message = "^ci", skip = true },
+  { message = "^chore", skip = true },
 ]
 protect_breaking_commits = true
 filter_commits = true
