@@ -27,7 +27,7 @@ jobs:
       tag: ${{ steps.bump.outputs.tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
 
@@ -95,7 +95,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout tag
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ needs.prepare-release.outputs.tag }}
           persist-credentials: false
