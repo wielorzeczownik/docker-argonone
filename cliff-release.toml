@@ -50,6 +50,7 @@ commit_parsers = [
   { message = "^build", skip = true },
   { message = "^ci", skip = true },
   { message = "^chore", skip = true },
+  { message = ".*", group = "Other" },
 ]
 protect_breaking_commits = true
 filter_commits = true
