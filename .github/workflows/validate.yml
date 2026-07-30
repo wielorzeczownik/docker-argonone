@@ -175,10 +175,37 @@ jobs:
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ matrix.tag }}
-          format: table
-          exit-code: "1"
+          format: json
+          output: trivy-${{ matrix.dockerfile }}.json
+          exit-code: "0"
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+
+      - name: Report vulnerabilities
+        shell: bash
+        env:
+          REPORT: trivy-${{ matrix.dockerfile }}.json
+          VARIANT: ${{ matrix.dockerfile }}
+        run: |
+          set -uo pipefail
+          count=$(jq '[.Results[]?.Vulnerabilities[]?] | length' "$REPORT")
+          if [[ "$count" -eq 0 ]]; then
+            echo "No fixable CRITICAL or HIGH vulnerabilities in $VARIANT."
+            exit 0
+          fi
+          echo "::warning title=trivy::$count fixable CRITICAL/HIGH vulnerabilities in $VARIANT - see the job summary. Not blocking this pull request."
+          {
+            echo "### Trivy findings for $VARIANT"
+            echo
+            echo "Remediation is a base image digest bump, which Renovate raises separately."
+            echo
+            echo '```text'
+            jq -r '
+              .Results[]?.Vulnerabilities[]?
+              | "\(.Severity) \(.VulnerabilityID) \(.PkgName) \(.InstalledVersion) -> \(.FixedVersion // "no fix")"
+            ' "$REPORT" | sort -u
+            echo '```'
+          } >>"$GITHUB_STEP_SUMMARY"
 
   shell:
     name: Shell (shfmt + shellcheck)
