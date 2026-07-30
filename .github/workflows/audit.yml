@@ -12,13 +12,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  vulnerabilities:
-    name: Audit dependencies and published images
+  dependencies:
+    name: Audit dependencies
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 15
     permissions:
       contents: read
-      packages: read
       issues: write
     steps:
       - name: Checkout
@@ -34,41 +33,10 @@ jobs:
       - name: Install pip-audit
         run: pip install pip-audit==2.10.1
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Scan published image
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        env:
-          TRIVY_PLATFORM: linux/arm64
-        with:
-          image-ref: ghcr.io/${{ github.repository }}:latest
-          format: json
-          output: trivy-latest.json
-          exit-code: "0"
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
-
-      - name: Scan published image (systemd variant)
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        env:
-          TRIVY_PLATFORM: linux/arm64
-        with:
-          image-ref: ghcr.io/${{ github.repository }}:systemd
-          format: json
-          output: trivy-systemd.json
-          exit-code: "0"
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
-
-      - name: Aggregate findings
+      - name: Run audit
         id: audit
         shell: bash
-        run: bash scripts/security-audit.sh latest=trivy-latest.json systemd=trivy-systemd.json
+        run: bash scripts/security-audit.sh
 
       - name: Create issue
         if: ${{ steps.audit.outputs.unresolved == 'true' }}
@@ -95,7 +63,84 @@ jobs:
         uses: peter-evans/close-issue@05dff7ca07116e5707cfb3a3cd4af7bb5e43524c # v3.0.2
         with:
           issue-number: ${{ steps.advisory_issue.outputs.issue-number }}
-          comment: "`pip-audit` and the image scan no longer report advisories."
+          comment: "`pip-audit` no longer reports advisories."
+
+  images:
+    name: Audit published images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Scan published image
+        env:
+          TRIVY_PLATFORM: linux/arm64
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:latest
+          format: json
+          output: trivy-latest.json
+          exit-code: "0"
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Scan published image (systemd variant)
+        env:
+          TRIVY_PLATFORM: linux/arm64
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:systemd
+          format: json
+          output: trivy-systemd.json
+          exit-code: "0"
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Aggregate findings
+        id: images
+        shell: bash
+        run: bash scripts/image-audit.sh latest=trivy-latest.json systemd=trivy-systemd.json
+
+      - name: Create issue
+        if: ${{ steps.images.outputs.unresolved == 'true' }}
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          IMAGE_REPORT: ${{ steps.images.outputs.report }}
+        with:
+          filename: .github/image-advisory-issue.md
+          assignees: ${{ github.repository_owner }}
+          search_existing: open
+          update_existing: true
+
+      - name: Find image advisory issue
+        id: image_issue
+        if: ${{ steps.images.outputs.unresolved == 'false' }}
+        uses: micalevisk/last-issue-action@0d40124cc99ac8601c2516007f0c98ef3d27537b # v2.3.0
+        with:
+          labels: image-advisory
+          state: open
+
+      - name: Close image advisory issue
+        if: ${{ steps.images.outputs.unresolved == 'false' && steps.image_issue.outputs.has-found == 'true' }}
+        uses: peter-evans/close-issue@05dff7ca07116e5707cfb3a3cd4af7bb5e43524c # v3.0.2
+        with:
+          issue-number: ${{ steps.image_issue.outputs.issue-number }}
+          comment: "Trivy no longer reports fixable advisories in the published images."
 
   upstream:
     name: Audit upstream drift
