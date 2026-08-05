@@ -2,7 +2,7 @@ name: Stale
 
 on:
   schedule:
-    - cron: "30 3 * * 1"
+    - cron: '30 3 * * 1'
   workflow_dispatch:
 
 permissions: {}
@@ -28,8 +28,8 @@ jobs:
           days-before-close: 14
           stale-issue-label: stale
           stale-pr-label: stale
-          exempt-issue-labels: "pinned,security,security advisory,npm advisory,image advisory,upstream drift,breaking change"
-          exempt-pr-labels: "pinned,security,security advisory,npm advisory,image advisory,upstream drift,breaking change"
+          exempt-issue-labels: 'pinned,security,security advisory,npm advisory,image advisory,upstream drift,breaking change'
+          exempt-pr-labels: 'pinned,security,security advisory,npm advisory,image advisory,upstream drift,breaking change'
           exempt-all-milestones: true
           stale-issue-message: >-
             No activity here for 60 days, so this is being marked stale. Comment

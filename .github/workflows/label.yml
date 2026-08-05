@@ -46,16 +46,16 @@ jobs:
       - name: Label by size
         uses: CodelyTV/pr-size-labeler@095a41fca88b8764fd9e008ad269bcdb82bb38b9 # v1.10.4
         with:
-          xs_label: "size:XS"
-          xs_max_size: "10"
-          s_label: "size:S"
-          s_max_size: "30"
-          m_label: "size:M"
-          m_max_size: "100"
-          l_label: "size:L"
-          l_max_size: "500"
-          xl_label: "size:XL"
-          files_to_ignore: "tests/* assets/*"
+          xs_label: 'size:XS'
+          xs_max_size: '10'
+          s_label: 'size:S'
+          s_max_size: '30'
+          m_label: 'size:M'
+          m_max_size: '100'
+          l_label: 'size:L'
+          l_max_size: '500'
+          xl_label: 'size:XL'
+          files_to_ignore: 'tests/* assets/*'
           message_if_xl: >-
             This pull request changes more than 500 lines, not counting tests.
             Please check that it is not addressing several unrelated things at

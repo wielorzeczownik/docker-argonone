@@ -5,11 +5,11 @@ on:
     branches:
       - master
     paths:
-      - "Dockerfile"
-      - "Dockerfile.systemd"
-      - ".dockerignore"
-      - "healthcheck.py"
-      - "patches/**"
+      - 'Dockerfile'
+      - 'Dockerfile.systemd'
+      - '.dockerignore'
+      - 'healthcheck.py'
+      - 'patches/**'
 
 permissions: {}
 
@@ -80,7 +80,7 @@ jobs:
         if: ${{ steps.bump.outputs.released == 'true' }}
         uses: qoomon/actions--create-commit@7102b1a8b3cb8716dc70dbeb6d774c375d779d2f # v1.2.5
         with:
-          message: "chore(release): ${{ steps.bump.outputs.tag }} [skip ci]"
+          message: 'chore(release): ${{ steps.bump.outputs.tag }} [skip ci]'
           skip-empty: true
 
       - name: Push commit
@@ -91,8 +91,8 @@ jobs:
         if: ${{ steps.bump.outputs.released == 'true' }}
         uses: qoomon/actions--create-tag@bc18da911783e8dd24a7ae3ec1a95af941d29f60 # v1.0.0
         with:
-          name: "${{ steps.bump.outputs.tag }}"
-          message: "${{ steps.bump.outputs.tag }}"
+          name: '${{ steps.bump.outputs.tag }}'
+          message: '${{ steps.bump.outputs.tag }}'
 
       - name: Push tag
         if: ${{ steps.bump.outputs.released == 'true' }}

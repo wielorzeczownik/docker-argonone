@@ -2,7 +2,7 @@ name: Audit
 
 on:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 permissions: {}
@@ -28,7 +28,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: Install pip-audit
         run: pip install pip-audit==2.10.1
@@ -63,7 +63,7 @@ jobs:
         uses: peter-evans/close-issue@05dff7ca07116e5707cfb3a3cd4af7bb5e43524c # v3.0.2
         with:
           issue-number: ${{ steps.advisory_issue.outputs.issue-number }}
-          comment: "`pip-audit` no longer reports advisories."
+          comment: '`pip-audit` no longer reports advisories.'
 
   images:
     name: Audit published images
@@ -94,7 +94,7 @@ jobs:
           image-ref: ghcr.io/${{ github.repository }}:latest
           format: json
           output: trivy-latest.json
-          exit-code: "0"
+          exit-code: '0'
           severity: CRITICAL,HIGH
           ignore-unfixed: true
 
@@ -106,7 +106,7 @@ jobs:
           image-ref: ghcr.io/${{ github.repository }}:systemd
           format: json
           output: trivy-systemd.json
-          exit-code: "0"
+          exit-code: '0'
           severity: CRITICAL,HIGH
           ignore-unfixed: true
 
@@ -140,7 +140,7 @@ jobs:
         uses: peter-evans/close-issue@05dff7ca07116e5707cfb3a3cd4af7bb5e43524c # v3.0.2
         with:
           issue-number: ${{ steps.image_issue.outputs.issue-number }}
-          comment: "Trivy no longer reports fixable advisories in the published images."
+          comment: 'Trivy no longer reports fixable advisories in the published images.'
 
   upstream:
     name: Audit upstream drift
@@ -185,4 +185,4 @@ jobs:
         uses: peter-evans/close-issue@05dff7ca07116e5707cfb3a3cd4af7bb5e43524c # v3.0.2
         with:
           issue-number: ${{ steps.drift_issue.outputs.issue-number }}
-          comment: "Upstream files match `patches/upstream.sha256` again."
+          comment: 'Upstream files match `patches/upstream.sha256` again.'
