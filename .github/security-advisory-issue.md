@@ -1,6 +1,6 @@
 ---
 title: Unresolved security advisories
-labels: security-advisory
+labels: security advisory
 ---
 
 `pip-audit` reports advisories against the pinned lint and test tooling that
