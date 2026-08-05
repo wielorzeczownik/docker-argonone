@@ -1,6 +1,6 @@
 ---
 title: Unresolved image vulnerabilities
-labels: image-advisory
+labels: image advisory
 ---
 
 Trivy reports fixable CRITICAL or HIGH vulnerabilities in the published images.

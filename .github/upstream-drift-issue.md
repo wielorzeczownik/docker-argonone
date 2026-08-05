@@ -1,6 +1,6 @@
 ---
 title: Upstream drift detected
-labels: upstream-drift
+labels: upstream drift
 ---
 
 One or more upstream files no longer match the hashes in

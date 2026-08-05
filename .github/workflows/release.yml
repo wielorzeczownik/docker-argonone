@@ -5,11 +5,11 @@ on:
     branches:
       - master
     paths:
-      - "Dockerfile"
-      - "Dockerfile.systemd"
-      - ".dockerignore"
-      - "healthcheck.py"
-      - "patches/**"
+      - 'Dockerfile'
+      - 'Dockerfile.systemd'
+      - '.dockerignore'
+      - 'healthcheck.py'
+      - 'patches/**'
 
 permissions: {}
 
@@ -45,8 +45,28 @@ jobs:
           OUTPUT: bumped-version.txt
           GITHUB_REPO: ${{ github.repository }}
 
+      - name: Detect user-facing changes (git-cliff)
+        id: cliff_userfacing
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
+        with:
+          config: cliff-release.toml
+          args: --unreleased --context
+        env:
+          OUTPUT: user-facing.json
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Count user-facing commits
+        id: userfacing
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=$(jq '[.[].commits[]] | length' user-facing.json)
+          echo "User-facing commits since the last tag: $count"
+          echo "count=$count" >>"$GITHUB_OUTPUT"
+
       - name: Resolve release version
         id: bump
+        if: ${{ steps.userfacing.outputs.count != '0' }}
         shell: bash
         env:
           CLIFF_BUMPED_VERSION: ${{ steps.cliff_bumped.outputs.content }}
@@ -61,6 +81,7 @@ jobs:
         env:
           OUTPUT: release-notes.md
           GITHUB_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Generate CHANGELOG.md (git-cliff)
         if: ${{ steps.bump.outputs.released == 'true' }}
@@ -80,7 +101,7 @@ jobs:
         if: ${{ steps.bump.outputs.released == 'true' }}
         uses: qoomon/actions--create-commit@7102b1a8b3cb8716dc70dbeb6d774c375d779d2f # v1.2.5
         with:
-          message: "chore(release): ${{ steps.bump.outputs.tag }} [skip ci]"
+          message: 'chore(release): ${{ steps.bump.outputs.tag }} [skip ci]'
           skip-empty: true
 
       - name: Push commit
@@ -91,8 +112,8 @@ jobs:
         if: ${{ steps.bump.outputs.released == 'true' }}
         uses: qoomon/actions--create-tag@bc18da911783e8dd24a7ae3ec1a95af941d29f60 # v1.0.0
         with:
-          name: "${{ steps.bump.outputs.tag }}"
-          message: "${{ steps.bump.outputs.tag }}"
+          name: '${{ steps.bump.outputs.tag }}'
+          message: '${{ steps.bump.outputs.tag }}'
 
       - name: Push tag
         if: ${{ steps.bump.outputs.released == 'true' }}
