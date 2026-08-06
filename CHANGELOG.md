@@ -5,6 +5,70 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.1...v2.1.2) - 2026-08-06
+
+### Bug Fixes
+
+- Link bot authors and pull requests in the release notes ([53e3b9b](https://github.com/wielorzeczownik/docker-argonone/commit/53e3b9bbaaae2027c13acd7e196d0f458382a99e))
+- Cover every dependency manifest in the label rules ([d6cae35](https://github.com/wielorzeczownik/docker-argonone/commit/d6cae35d6be14d660a0e929d3c99462ba19570e4))
+- Pass issue assignees as an action input instead of front matter ([6e8e360](https://github.com/wielorzeczownik/docker-argonone/commit/6e8e3601a2f5959ef7f6ddee1ab0b3de1c3b4dc7))
+- Scan the arm64 image variant so trivy finds a manifest ([c6c1133](https://github.com/wielorzeczownik/docker-argonone/commit/c6c1133683ce0ee80e585ef64492145fa0c6324b))
+
+### Refactoring
+
+- Collapse the two assign steps into one ([687b3cc](https://github.com/wielorzeczownik/docker-argonone/commit/687b3ccdc9da28890d2ef3afe7178a0c393c2a97))
+
+### Documentation
+
+- Drop the redundant comment above commit_preprocessors ([da4f86c](https://github.com/wielorzeczownik/docker-argonone/commit/da4f86cb7a29976c1abf2bf74427693ce078cbb7))
+- Document configuration, local checks, and CI structure ([dda4b22](https://github.com/wielorzeczownik/docker-argonone/commit/dda4b22aa54751382c1811d4a22b24a45320c488))
+
+### Styling
+
+- Drop the no-op whitespace trim inside the profile url ([2d1d9b9](https://github.com/wielorzeczownik/docker-argonone/commit/2d1d9b951e064de3c2b33c663e22ee8449aff0a3))
+
+### Build System
+
+- Trim the build context and drop a stale ignore entry ([25d48cc](https://github.com/wielorzeczownik/docker-argonone/commit/25d48cc2bfea8389b652617ba37fa9f386024392))
+- Pin action digests and group renovate updates ([073eef4](https://github.com/wielorzeczownik/docker-argonone/commit/073eef40cbb4d113c974d9baa4b75230bb61d8b6))
+- Pin ruff and lint tests with production rules ([6bed1c1](https://github.com/wielorzeczownik/docker-argonone/commit/6bed1c1837717900e6a1e855f5a143b83645a4c8))
+
+### CI/CD
+
+- Update docker/login-action action to v4.6.0 (#82) ([f9b263b](https://github.com/wielorzeczownik/docker-argonone/commit/f9b263b3b6c83a5e5a0f47f8d14d129a6ad424c0))
+- Update taiki-e/install-action action to v2.85.4 (#83) ([534ba99](https://github.com/wielorzeczownik/docker-argonone/commit/534ba997fdcf1cd28b823f1bb4da1e6c394adb69))
+- Publish through a deployment environment ([06e4c87](https://github.com/wielorzeczownik/docker-argonone/commit/06e4c875c4c475e89fc1095469b8a9038403c8d2))
+- Update taiki-e/install-action action to v2.85.3 (#80) ([479a0cd](https://github.com/wielorzeczownik/docker-argonone/commit/479a0cdf0f10761d11fe063278117ab09d0132ea))
+- Update docker/login-action action to v4.5.2 (#79) ([a4e3e84](https://github.com/wielorzeczownik/docker-argonone/commit/a4e3e84357c1039337e9c538bdf15c3abf95aff5))
+- Update taiki-e/install-action action to v2.85.2 (#77) ([19e6144](https://github.com/wielorzeczownik/docker-argonone/commit/19e614437b7333e8544638a3cf791111d6a8c8d7))
+- Update taiki-e/install-action action to v2.85.1 (#76) ([a40a402](https://github.com/wielorzeczownik/docker-argonone/commit/a40a40255ef61ff787c7d8c5a10c2416954e280d))
+- Update docker/login-action action to v4.5.1 (#75) ([08803b2](https://github.com/wielorzeczownik/docker-argonone/commit/08803b2aadf91c2a863674a13ceadbe54ba9a015))
+- Sign bot commits via GitHub API (qoomon create-commit/create-tag) ([fc4a38b](https://github.com/wielorzeczownik/docker-argonone/commit/fc4a38b3588a67fb3e6ca3739066ba860e59d5d7))
+- Update docker/login-action action to v4.5.0 ([8734380](https://github.com/wielorzeczownik/docker-argonone/commit/873438041fd0b1155b57b83c0493464d84a3a6ba))
+- Update taiki-e/install-action action to v2.85.0 ([f1f1fab](https://github.com/wielorzeczownik/docker-argonone/commit/f1f1fab3e0fabf85030f7179ef5f98a21d8d9f6e))
+- Split the audit into dependency, image, and upstream jobs ([f7a23aa](https://github.com/wielorzeczownik/docker-argonone/commit/f7a23aa1ac6b3f380f682c011fb2712ed1b092f5))
+- Derive the version bump from cliff.toml ([9d58fb9](https://github.com/wielorzeczownik/docker-argonone/commit/9d58fb955190ef4b710b5f6a4fa110b400e49ded))
+- Emit commit_changes and split the commit step like ahe-ics ([f87846f](https://github.com/wielorzeczownik/docker-argonone/commit/f87846f74c9e1eac2a451262a7a2e7f3c6ce6500))
+- Keep unlisted commit types in release notes ([5f03c92](https://github.com/wielorzeczownik/docker-argonone/commit/5f03c921482264ca4adf94122c09d639fa624ace))
+- Skip merge and release commits in release notes ([2c819b2](https://github.com/wielorzeczownik/docker-argonone/commit/2c819b2d261d69d975946bb90dea8abeaa3314e1))
+- Warn instead of failing on image vulnerabilities ([cee3c23](https://github.com/wielorzeczownik/docker-argonone/commit/cee3c2305e33ed3d7819a73ac4a0118146c60e55))
+- Replace the upstream-drift workflow with a scheduled audit ([e8bd4a8](https://github.com/wielorzeczownik/docker-argonone/commit/e8bd4a8d27cbe816878526cbbca8d086e60f4aa3))
+- Stop cancelling in-flight releases and pin the toolchain ([0923be7](https://github.com/wielorzeczownik/docker-argonone/commit/0923be7b0a005e684c243f72091686b60054ccd5))
+- Gate validate jobs behind a path filter and pin the toolchain ([838a487](https://github.com/wielorzeczownik/docker-argonone/commit/838a487a6115adba0a027179c501a5c6c3883ddf))
+- Emit resolve-version outputs through one helper ([dadda81](https://github.com/wielorzeczownik/docker-argonone/commit/dadda81c351ec9e835bf77600540dfdafe46bfa4))
+- Update davidanson/markdownlint-cli2-action action to v24.1.0 ([184c3b6](https://github.com/wielorzeczownik/docker-argonone/commit/184c3b636b7d317b35058f8bf884340de832cbe8))
+- Update actions/checkout action to v7.0.1 ([60e32ba](https://github.com/wielorzeczownik/docker-argonone/commit/60e32ba5bd1b98db037a42dc6c9664903627afc8))
+- Update softprops/action-gh-release action to v3.0.2 ([3b7ace6](https://github.com/wielorzeczownik/docker-argonone/commit/3b7ace6bd8e7c0c2e1d860dd906b75cec3762936))
+
+### Dependencies
+
+- Update ubuntu:26.04 docker digest to 678c655 (#84) ([1cdaf14](https://github.com/wielorzeczownik/docker-argonone/commit/1cdaf14debfe4cfaa32f90d469da2d0e594f9737))
+- Update dependency ruff to v0.16.1 (#78) ([2084366](https://github.com/wielorzeczownik/docker-argonone/commit/2084366192e319e61f006d48c924d2bece044504))
+
+### Other
+
+- Ci/labels and automation (#81) ([3f225b9](https://github.com/wielorzeczownik/docker-argonone/commit/3f225b993eec938e346326af7615d4c002460f21))
+
 ## [2.1.1](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.0...v2.1.1) - 2026-07-20
 
 ### Performance
