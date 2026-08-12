@@ -40,6 +40,6 @@ COPY --chmod=755 patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
 COPY --chmod=755 healthcheck.py /usr/local/bin/healthcheck
 
 HEALTHCHECK --interval=60s --timeout=5s --start-period=10s --retries=3 \
-  CMD healthcheck
+  CMD ["healthcheck"]
 
 CMD ["/usr/bin/python3", "/etc/argon/argononed.py", "SERVICE"]

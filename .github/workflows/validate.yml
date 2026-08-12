@@ -220,7 +220,7 @@ jobs:
           persist-credentials: false
 
       - name: Install shfmt and shellcheck
-        uses: taiki-e/install-action@6a1bd70eaac3c8bdf093356838d7ee09fda951cf # v2.85.5
+        uses: taiki-e/install-action@cb33e69fad06166ca28a42b2575e4dadabf62ee8 # v2.85.8
         with:
           tool: shfmt,shellcheck
 
@@ -277,7 +277,7 @@ jobs:
           persist-credentials: false
 
       - name: Lint Markdown
-        uses: DavidAnson/markdownlint-cli2-action@6bf21b07787794f89a243495939cd651942aeabe # v24.1.0
+        uses: DavidAnson/markdownlint-cli2-action@21c1be1b93ad9ed58fa840aacc3f279cde2a72ff # v24.2.0
         with:
           globs: |
             **/*.md
