@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.3](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.2...v2.1.3) - 2026-08-12
+
+### Bug Fixes
+
+- Restore plain @mentions for human authors so avatars render ([3dc6bbb](https://github.com/wielorzeczownik/docker-argonone/commit/3dc6bbbb96fc37b59b187c200d8f90788c68c218))
+
+### CI/CD
+
+- Update github actions (#86) ([1841c45](https://github.com/wielorzeczownik/docker-argonone/commit/1841c45d29ad25c90f394eeb0986b73e054a35fb))
+- Update github actions (#85) ([719ad92](https://github.com/wielorzeczownik/docker-argonone/commit/719ad924af538a1a99c6d6254a71a0fcbe3fc662))
+
+### Dependencies
+
+- Update dependency ruff to v0.16.2 (#87) ([3d0feef](https://github.com/wielorzeczownik/docker-argonone/commit/3d0feef44655b85822ff69baa85ef4d8f3736d81))
+
 ## [2.1.2](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.1...v2.1.2) - 2026-08-06
 
 ### Bug Fixes
