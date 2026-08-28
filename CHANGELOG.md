@@ -5,6 +5,16 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.5](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.4...v2.1.5) - 2026-08-28
+
+### CI/CD
+
+- Update taiki-e/install-action action to v2.86.4 (#104) ([f540617](https://github.com/wielorzeczownik/docker-argonone/commit/f5406170e5a7c4495f36b2a8447e88c29b92be90))
+
+### Dependencies
+
+- Update ubuntu:26.04 docker digest to 2260313 (#99) ([b991043](https://github.com/wielorzeczownik/docker-argonone/commit/b991043e54cb896c8994eb9356bf1579bebba924))
+
 ## [2.1.4](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.3...v2.1.4) - 2026-08-28
 
 ### CI/CD
