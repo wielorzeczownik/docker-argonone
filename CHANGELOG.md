@@ -5,6 +5,31 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.4](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.3...v2.1.4) - 2026-08-28
+
+### CI/CD
+
+- Update taiki-e/install-action action to v2.86.3 (#101) ([67546d9](https://github.com/wielorzeczownik/docker-argonone/commit/67546d93e3791a4be56f27baae14d7df679916b1))
+- Update docker/setup-buildx-action action to v4.3.0 (#102) ([e26e1cf](https://github.com/wielorzeczownik/docker-argonone/commit/e26e1cf5661478f0c186d9415690ccc3a2f06297))
+- Update taiki-e/install-action action to v2.86.1 (#98) ([522ca48](https://github.com/wielorzeczownik/docker-argonone/commit/522ca48c6b5fbbc4fe18f83d97715bcda9537d72))
+- Update taiki-e/install-action action to v2.85.13 (#97) ([d5dbd4b](https://github.com/wielorzeczownik/docker-argonone/commit/d5dbd4be3d8e72d863ddd8862ebb7ea9591867d6))
+- Update taiki-e/install-action action to v2.85.12 (#96) ([5bed215](https://github.com/wielorzeczownik/docker-argonone/commit/5bed2150c5db4c7c76b76832228e822b09937c1f))
+- Update taiki-e/install-action action to v2.85.11 (#93) ([7255b19](https://github.com/wielorzeczownik/docker-argonone/commit/7255b190fddda1db3b9f0d8aedd296a8716af91c))
+- Update taiki-e/install-action action to v2.85.10 (#92) ([cf9b482](https://github.com/wielorzeczownik/docker-argonone/commit/cf9b482b065024ac01f8c9df047aebaa3fa18591))
+- Update actions/attest-build-provenance action to v4.2.2 (#90) ([8d09ea4](https://github.com/wielorzeczownik/docker-argonone/commit/8d09ea4db5ccba3728d81adefa8dfa4760207deb))
+- Update taiki-e/install-action action to v2.85.9 (#89) ([cc2af07](https://github.com/wielorzeczownik/docker-argonone/commit/cc2af075e1713b44f5ada97c3fef60b1be623499))
+- Update dorny/paths-filter action to v4.0.3 (#88) ([a599694](https://github.com/wielorzeczownik/docker-argonone/commit/a599694c22c25a38b6f30aec4777617012d50cf1))
+
+### Dependencies
+
+- Update dependency ruff to v0.16.4 (#100) ([12ef1ab](https://github.com/wielorzeczownik/docker-argonone/commit/12ef1abc87b79fc9f8c080402e08b094390dead8))
+- Update dependency mypy to v2.3.1 (#95) ([536ab09](https://github.com/wielorzeczownik/docker-argonone/commit/536ab09b0700c9a7c42b6a0cee54587557a86f9a))
+- Update dependency ruff to v0.16.3 (#94) ([f909c4d](https://github.com/wielorzeczownik/docker-argonone/commit/f909c4d76f28e699025ad55f466aea10598ee914))
+
+### Miscellaneous
+
+- Accept upstream argon1.sh drift (#105) ([3b7e2ac](https://github.com/wielorzeczownik/docker-argonone/commit/3b7e2aca7a9b780ae1683982dcecbaf7b67e2351))
+
 ## [2.1.3](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.2...v2.1.3) - 2026-08-12
 
 ### Bug Fixes
