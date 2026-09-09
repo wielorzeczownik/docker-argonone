@@ -37,7 +37,7 @@ jobs:
 
       - name: Determine next version (git-cliff)
         id: cliff_bumped
-        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
+        uses: orhun/git-cliff-action@3d96a18cc4ec17e9dc69ddcc424ccafaf1f78ce2 # v4.9.0
         with:
           config: cliff.toml
           args: --bumped-version
@@ -47,7 +47,7 @@ jobs:
 
       - name: Detect user-facing changes (git-cliff)
         id: cliff_userfacing
-        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
+        uses: orhun/git-cliff-action@3d96a18cc4ec17e9dc69ddcc424ccafaf1f78ce2 # v4.9.0
         with:
           config: cliff-release.toml
           args: --unreleased --context
@@ -74,7 +74,7 @@ jobs:
 
       - name: Generate release notes (git-cliff)
         if: ${{ steps.bump.outputs.released == 'true' }}
-        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
+        uses: orhun/git-cliff-action@3d96a18cc4ec17e9dc69ddcc424ccafaf1f78ce2 # v4.9.0
         with:
           config: cliff-release.toml
           args: --unreleased --tag ${{ steps.bump.outputs.tag }}
@@ -85,7 +85,7 @@ jobs:
 
       - name: Generate CHANGELOG.md (git-cliff)
         if: ${{ steps.bump.outputs.released == 'true' }}
-        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
+        uses: orhun/git-cliff-action@3d96a18cc4ec17e9dc69ddcc424ccafaf1f78ce2 # v4.9.0
         with:
           config: cliff.toml
           args: --tag ${{ steps.bump.outputs.tag }}
