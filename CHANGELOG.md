@@ -5,6 +5,49 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.6](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.5...v2.1.6) - 2026-09-27
+
+### CI/CD
+
+- Update taiki-e/install-action action to v2.87.17 (#136) ([dddf5f4](https://github.com/wielorzeczownik/docker-argonone/commit/dddf5f475cc32f9c259621a537e7db4d69839b50))
+- Update github actions (#134) ([4835b29](https://github.com/wielorzeczownik/docker-argonone/commit/4835b2950a060a7178fc767c77b88cb518a1639e))
+- Update taiki-e/install-action action to v2.87.14 (#133) ([742e625](https://github.com/wielorzeczownik/docker-argonone/commit/742e6255a3465c31f8428321490c00aecd5f0ab9))
+- Update docker/setup-buildx-action action to v4.4.1 (#132) ([2cbc7bf](https://github.com/wielorzeczownik/docker-argonone/commit/2cbc7bff2a4fe22921b586ac7119c5a9fbec7159))
+- Update docker actions (#131) ([f46c9e2](https://github.com/wielorzeczownik/docker-argonone/commit/f46c9e23e7e4bbac9772567a965c47c2a89e0891))
+- Update taiki-e/install-action action to v2.87.13 (#130) ([759c7ca](https://github.com/wielorzeczownik/docker-argonone/commit/759c7caf04c6b61cabc224cdc57bc550f85bd0e1))
+- Update github actions (#128) ([fd17143](https://github.com/wielorzeczownik/docker-argonone/commit/fd17143a0d978b3fca0927a0c34fd480d75a2881))
+- Update taiki-e/install-action action to v2.87.11 (#125) ([c741cd4](https://github.com/wielorzeczownik/docker-argonone/commit/c741cd47170a4a8ef9aa2222854ab5016432c714))
+- Update taiki-e/install-action action to v2.87.10 (#124) ([ef4a9e2](https://github.com/wielorzeczownik/docker-argonone/commit/ef4a9e237d72d79615d5611e65c01e294459d7a2))
+- Update taiki-e/install-action action to v2.87.9 (#123) ([6f81d9d](https://github.com/wielorzeczownik/docker-argonone/commit/6f81d9d92f0796566f68b79400ac66227d2679d7))
+- Update taiki-e/install-action action to v2.87.8 (#122) ([e0a852e](https://github.com/wielorzeczownik/docker-argonone/commit/e0a852ea56f167558a264509d4f610881aa2d01f))
+- Update taiki-e/install-action action to v2.87.7 (#121) ([adcdd46](https://github.com/wielorzeczownik/docker-argonone/commit/adcdd46c3266d93baaa009f611e7d37de3f630a4))
+- Update taiki-e/install-action action to v2.87.6 (#118) ([c7f8eae](https://github.com/wielorzeczownik/docker-argonone/commit/c7f8eaed157246332e580547805dc8b2c05bd3c8))
+- Update taiki-e/install-action action to v2.87.5 (#117) ([33eaaed](https://github.com/wielorzeczownik/docker-argonone/commit/33eaaed4ed3b5907e0cc3694bce644d0ff7bc30a))
+- Update github actions (#116) ([279e202](https://github.com/wielorzeczownik/docker-argonone/commit/279e202ff55c98ce89a6fbae769a145b175a0b07))
+- Update docker/setup-qemu-action action to v4.3.0 (#115) ([6d640e7](https://github.com/wielorzeczownik/docker-argonone/commit/6d640e7cc6535c2e30eb11dd36e44a4e7800c0fb))
+- Update taiki-e/install-action action to v2.87.2 (#114) ([8919b5c](https://github.com/wielorzeczownik/docker-argonone/commit/8919b5c6bbe1197393dc3908bb249ed99ddea0a0))
+- Update softprops/action-gh-release action to v3.0.3 (#112) ([3f4d176](https://github.com/wielorzeczownik/docker-argonone/commit/3f4d1762ac0744e8dbbdca3964fd6fedbd893a16))
+- Update taiki-e/install-action action to v2.87.1 (#111) ([ba73509](https://github.com/wielorzeczownik/docker-argonone/commit/ba73509370818d9880b9277c9f42fdc0af9954cf))
+- Update taiki-e/install-action action to v2.87.0 (#110) ([c3e27b1](https://github.com/wielorzeczownik/docker-argonone/commit/c3e27b1dcef79db586fb302d663025bcdaad7444))
+- Update taiki-e/install-action action to v2.86.8 (#109) ([ea6992c](https://github.com/wielorzeczownik/docker-argonone/commit/ea6992c34a47337bb5d630c8ae4b3c0a5a2c15c4))
+- Update github actions (#108) ([70d69df](https://github.com/wielorzeczownik/docker-argonone/commit/70d69df155967a4094143c558a940dbaca3c624d))
+- Update taiki-e/install-action action to v2.86.6 (#107) ([73e5323](https://github.com/wielorzeczownik/docker-argonone/commit/73e532374d5c11f2c02ee6e84369e3896255e645))
+
+### Dependencies
+
+- Update ubuntu:26.04 docker digest to da6fc2b (#119) ([b5cd46f](https://github.com/wielorzeczownik/docker-argonone/commit/b5cd46fc998a506c4e260d60c18c45b3828b5a20))
+- Update dependency prettier to v3.9.9 (#135) ([85c6303](https://github.com/wielorzeczownik/docker-argonone/commit/85c6303aa3667a65de3211aec65f0d6a70080aa0))
+- Update dependency prettier to v3.9.8 (#129) ([cff6675](https://github.com/wielorzeczownik/docker-argonone/commit/cff66751d5e2ddb64e8f25736af95998d09f03bc))
+- Update dependency ruff to v0.16.8 (#127) ([4d824ec](https://github.com/wielorzeczownik/docker-argonone/commit/4d824ec2bbb79be6b5f260111243bf76b4633f19))
+- Update dependency prettier to v3.9.7 (#126) ([c996f3d](https://github.com/wielorzeczownik/docker-argonone/commit/c996f3d2e6edf812c94256b2f3c444f420c05907))
+- Update dependency ruff to v0.16.7 (#120) ([39ae88d](https://github.com/wielorzeczownik/docker-argonone/commit/39ae88df4fb17ec85aaf79aa8174556c9af8a18c))
+- Update dependency ruff to v0.16.6 (#113) ([47db427](https://github.com/wielorzeczownik/docker-argonone/commit/47db427c7d6cb2f104c5baad06569fac1a97a789))
+- Update dependency ruff to v0.16.5 (#106) ([e8298a5](https://github.com/wielorzeczownik/docker-argonone/commit/e8298a50d8a110d77723dc132dd8990b19b86c08))
+
+### Miscellaneous
+
+- Enable vulnerabilityAlerts (#137) ([a11b7b3](https://github.com/wielorzeczownik/docker-argonone/commit/a11b7b30da290e70c24e7b4bc2d7c217a0d3edd9))
+
 ## [2.1.5](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.4...v2.1.5) - 2026-08-28
 
 ### CI/CD
