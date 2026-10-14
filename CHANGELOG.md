@@ -5,6 +5,22 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.7](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.6...v2.1.7) - 2026-10-14
+
+### CI/CD
+
+- Update artifact actions (#146) ([76d9005](https://github.com/wielorzeczownik/docker-argonone/commit/76d900506cd76c4dacd194baa67d620cf007cdee))
+- Update taiki-e/install-action action to v2.87.26 (#145) ([e2626b3](https://github.com/wielorzeczownik/docker-argonone/commit/e2626b3a16781df7467356df1ef98728a262b14f))
+- Update github actions (#141) ([9a24e3f](https://github.com/wielorzeczownik/docker-argonone/commit/9a24e3ff89437dfd82e19df7b667d8fa20b0d804))
+- Update taiki-e/install-action action to v2.87.18 (#139) ([b94030c](https://github.com/wielorzeczownik/docker-argonone/commit/b94030c4a95fe1dc4787fa87315aadda491de03d))
+
+### Dependencies
+
+- Update ubuntu:26.04 docker digest to f144425 (#143) ([840bbdd](https://github.com/wielorzeczownik/docker-argonone/commit/840bbdda00c6cf37742bb8106d96f0e23acf6a5f))
+- Update python tooling (#142) ([714f91e](https://github.com/wielorzeczownik/docker-argonone/commit/714f91e79a93108c323bae78c0f25505dd0e2568))
+- Update dependency prettier to v3.9.10 (#144) ([0ab38ef](https://github.com/wielorzeczownik/docker-argonone/commit/0ab38ef2f4173ffc09f559ba5ccd48d46b834f97))
+- Update dependency ruff to v0.16.9 (#138) ([3e02640](https://github.com/wielorzeczownik/docker-argonone/commit/3e02640c82bae2778b07027e2e1b86792a5e8039))
+
 ## [2.1.6](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.5...v2.1.6) - 2026-09-27
 
 ### CI/CD
