@@ -25,7 +25,7 @@
       "description": "Track python tools pinned inline in workflow run steps",
       "fileMatch": ["^\\.github/workflows/[^/]+\\.yml$"],
       "matchStrings": [
-        "pip install (?<depName>[a-z0-9-]+)==(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+        "(?:uv tool|pip) install (?<depName>[a-z0-9-]+)==(?<currentValue>\\d+\\.\\d+\\.\\d+)"
       ],
       "datasourceTemplate": "pypi"
     },
@@ -73,7 +73,7 @@
     },
     {
       "description": "ruff, mypy and pytest are pinned together so a lint bump cannot land without its formatter",
-      "matchManagers": ["pip_requirements"],
+      "matchManagers": ["pep621"],
       "groupName": "python tooling"
     },
     {
@@ -97,5 +97,8 @@
       ],
       "groupName": "artifact actions"
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  }
 }
