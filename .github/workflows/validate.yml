@@ -196,7 +196,7 @@ jobs:
         run: pytest tests/ -v
 
   image:
-    name: Image
+    name: Image ${{ matrix.dockerfile }}
     needs: checks
     if: ${{ !cancelled() && needs.checks.outputs.image == 'true' }}
     runs-on: ubuntu-24.04
