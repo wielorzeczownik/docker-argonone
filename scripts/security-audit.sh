@@ -4,7 +4,7 @@ set -uo pipefail
 : "${GITHUB_OUTPUT:?GITHUB_OUTPUT is required}"
 
 unresolved=false
-report=$(bash "$(dirname "$0")/pip-audit-report.sh" --requirement requirements-lint.txt --requirement requirements-test.txt) || unresolved=true
+report=$(bash "$(dirname "$0")/pip-audit-report.sh" --disable-pip --requirement <(uv export --frozen --all-groups --no-emit-project --format requirements-txt)) || unresolved=true
 
 {
   echo "unresolved=$unresolved"

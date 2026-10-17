@@ -13,8 +13,8 @@ This project packages the [Argon ONE](https://www.argon40.com/) fan-control and 
 ├── Dockerfile                    image definition (standard variant)
 ├── Dockerfile.systemd            image definition (systemd variant)
 ├── healthcheck.py                container healthcheck script
-├── requirements-lint.txt         pinned lint dependencies (ruff, mypy)
-├── requirements-test.txt         pinned test dependencies (pytest)
+├── pyproject.toml                dev tool groups (lint: ruff, mypy, dev: lint + pytest)
+├── uv.lock                       every tool and transitive dependency, pinned with hashes
 ├── patches/
 │   ├── argononed.py              patched Argon ONE daemon (derived from upstream)
 │   ├── argonone-fanconfig.sh     patched fan config tool (derived from upstream)
@@ -39,9 +39,7 @@ This project packages the [Argon ONE](https://www.argon40.com/) fan-control and 
 ```bash
 git clone https://github.com/wielorzeczownik/docker-argonone.git
 cd docker-argonone
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-lint.txt -r requirements-test.txt
+uv sync
 ```
 
 ## Running checks locally
@@ -73,7 +71,7 @@ npx --yes prettier@3.9.6 --check .
 markdownlint-cli2 "**/*.md"
 
 # Dependency advisories
-pip-audit --requirement requirements-lint.txt --requirement requirements-test.txt --desc
+bash scripts/pip-audit-report.sh --disable-pip --requirement <(uv export --frozen --all-groups --no-emit-project --format requirements-txt)
 
 # Upstream drift
 python3 scripts/check-upstream.py
@@ -100,7 +98,7 @@ docker run --rm -v "$(pwd):/src" -w /src hadolint/hadolint hadolint Dockerfile
 docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff check scripts/ tests/ healthcheck.py
 docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff format --check scripts/ tests/ healthcheck.py
 
-docker run --rm -v "$(pwd):/src" -w /src python:3.12 sh -c "pip install -q -r requirements-lint.txt && mypy scripts/ healthcheck.py"
+docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/uv:python3.12-bookworm uv run --locked mypy scripts/ healthcheck.py
 
 docker run --rm -v "$(pwd):/src" -w /src mvdan/shfmt --diff scripts/
 docker run --rm -v "$(pwd):/mnt" -w /mnt koalaman/shellcheck:stable scripts/*.sh
