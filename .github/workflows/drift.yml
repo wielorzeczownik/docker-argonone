@@ -1,0 +1,58 @@
+name: Drift
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: drift
+  cancel-in-progress: false
+
+jobs:
+  upstream:
+    name: Drift
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check upstream file hashes
+        id: drift
+        shell: bash
+        run: bash scripts/upstream-drift.sh
+
+      - name: Create issue
+        if: ${{ steps.drift.outputs.unresolved == 'true' }}
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DRIFT_REPORT: ${{ steps.drift.outputs.report }}
+        with:
+          filename: .github/upstream-drift-issue.md
+          assignees: ${{ github.repository_owner }}
+          search_existing: open
+          update_existing: true
+
+      - name: Find drift issue
+        id: drift_issue
+        if: ${{ steps.drift.outputs.unresolved == 'false' }}
+        uses: micalevisk/last-issue-action@010dfff63530f63c7a9fd54211bde51cc38cff73 # v2.4.0
+        with:
+          labels: upstream drift
+          state: open
+
+      - name: Close drift issue
+        if: ${{ steps.drift.outputs.unresolved == 'false' && steps.drift_issue.outputs.has-found == 'true' }}
+        uses: peter-evans/close-issue@05dff7ca07116e5707cfb3a3cd4af7bb5e43524c # v3.0.2
+        with:
+          issue-number: ${{ steps.drift_issue.outputs.issue-number }}
+          comment: 'Upstream files match `patches/upstream.sha256` again.'

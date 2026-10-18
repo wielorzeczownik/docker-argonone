@@ -25,8 +25,7 @@ This project packages the [Argon ONE](https://www.argon40.com/) fan-control and 
 │   ├── check-upstream.py         verifies upstream files have not changed
 │   ├── update-upstream.py        refreshes upstream.sha256 after updating patches
 │   ├── resolve-version.sh        determines next release version from git-cliff
-│   ├── security-audit.sh         aggregates pip-audit and image scan findings
-│   └── upstream-drift.sh         wraps the drift check for the audit workflow
+│   └── upstream-drift.sh         wraps the drift check for the drift workflow
 └── tests/
     ├── conftest.py               mocks argon hardware modules for unit tests
     └── test_argononed.py         unit tests for patched daemon logic
@@ -69,9 +68,6 @@ actionlint
 # Formatting and markup
 npx --yes prettier@3.9.6 --check .
 markdownlint-cli2 "**/*.md"
-
-# Dependency advisories
-bash scripts/pip-audit-report.sh --disable-pip --requirement <(uv export --frozen --all-groups --no-emit-project --format requirements-txt)
 
 # Upstream drift
 python3 scripts/check-upstream.py
