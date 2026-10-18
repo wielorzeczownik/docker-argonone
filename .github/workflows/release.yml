@@ -128,7 +128,9 @@ jobs:
 
   image:
     name: Image ${{ matrix.variant }}
-    environment: release
+    environment:
+      name: release
+      deployment: false
     needs: prepare-release
     if: ${{ needs.prepare-release.outputs.released == 'true' }}
     runs-on: ubuntu-24.04-arm
