@@ -26,6 +26,15 @@ body = """
 - {% if contributor.username is ending_with("[bot]") %}[@{{ contributor.username | replace(from="[bot]", to="") }}](https://github.com/apps/{{ contributor.username | replace(from="[bot]", to="") }}){% else %}@{{ contributor.username }}{% endif %} made their first contribution{% if contributor.pr_number %} in [#{{ contributor.pr_number }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/pull/{{ contributor.pr_number }}){% endif %}
 {% endfor %}
 {%- endif %}
+{%- if remote.github.owner and remote.github.repo %}
+#### Verify
+
+The container image carries a signed build provenance attestation. Check it with:
+
+```sh
+gh attestation verify oci://ghcr.io/{{ remote.github.owner }}/{{ remote.github.repo }}:{{ version | trim_start_matches(pat="v") }} --repo {{ remote.github.owner }}/{{ remote.github.repo }}
+```
+{% endif %}
 {%- if previous.version and remote.github.owner and remote.github.repo %}
 ---
 **Full Changelog:** [{{ previous.version }}...{{ version }}](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/compare/{{ previous.version }}...{{ version }})
