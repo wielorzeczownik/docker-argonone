@@ -15,17 +15,6 @@
     {
       "matchManagers": ["pep621"],
       "groupName": "python tooling"
-    },
-    {
-      "matchManagers": ["github-actions"],
-      "matchPackageNames": [
-        "docker/build-push-action",
-        "docker/login-action",
-        "docker/metadata-action",
-        "docker/setup-buildx-action",
-        "docker/setup-qemu-action"
-      ],
-      "groupName": "docker actions"
     }
   ]
 }
