@@ -1,16 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>wielorzeczownik/.github"],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "fileMatch": ["^\\.github/workflows/[^/]+\\.yml$"],
-      "matchStrings": [
-        "(?:uv tool|pip) install (?<depName>[a-z0-9-]+)==(?<currentValue>\\d+\\.\\d+\\.\\d+)"
-      ],
-      "datasourceTemplate": "pypi"
-    }
-  ],
   "packageRules": [
     {
       "matchManagers": ["dockerfile"],
