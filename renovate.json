@@ -4,11 +4,6 @@
   "packageRules": [
     {
       "matchManagers": ["dockerfile"],
-      "pinDigests": true,
-      "semanticCommitType": "chore"
-    },
-    {
-      "matchManagers": ["dockerfile"],
       "matchPackageNames": ["ubuntu"],
       "groupName": "ubuntu base image"
     },
