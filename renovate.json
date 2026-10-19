@@ -43,7 +43,6 @@
     {
       "description": "Majors stay manual, everything else merges once it has soaked",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "groupName": "all non-major",
       "automerge": true
     },
     {
@@ -52,12 +51,6 @@
       "pinDigests": true,
       "minimumReleaseAge": "7 days",
       "semanticCommitType": "ci"
-    },
-    {
-      "description": "One pull request for every non-major action update",
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["minor", "patch", "digest"],
-      "groupName": "github actions"
     },
     {
       "description": "Base images carry a tag plus digest so rebuilding a tag uses the same layers",
