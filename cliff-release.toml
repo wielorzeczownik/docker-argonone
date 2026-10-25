@@ -52,6 +52,7 @@ conventional_commits = true
 filter_unconventional = true
 split_commits = false
 commit_parsers = [
+  { message = "\\[security\\]", group = "Security" },
   { message = "^chore\\(release\\)", skip = true },
   { message = "^Merge ", skip = true },
   { field = "breaking", pattern = "true", group = "Breaking Changes" },
