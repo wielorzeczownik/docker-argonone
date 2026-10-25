@@ -10,6 +10,9 @@ on:
       - '.dockerignore'
       - 'healthcheck.py'
       - 'patches/**'
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
 
 permissions: {}
 
@@ -28,12 +31,26 @@ jobs:
       released: ${{ steps.bump.outputs.released }}
       version: ${{ steps.bump.outputs.version }}
       tag: ${{ steps.bump.outputs.tag }}
+      prerelease: ${{ steps.kind.outputs.kind == 'rc' }}
       commit_changes: ${{ steps.bump.outputs.commit_changes }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+
+      - name: Decide release kind
+        id: kind
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          if [[ "$EVENT" == push && "$MESSAGE" != *"[security]"* ]]; then
+            echo "kind=rc" >>"$GITHUB_OUTPUT"
+          else
+            echo "kind=stable" >>"$GITHUB_OUTPUT"
+          fi
 
       - name: Determine next version (git-cliff)
         id: cliff_bumped
@@ -50,7 +67,7 @@ jobs:
         uses: orhun/git-cliff-action@a9a95522b26fe6403f7bb24031f21fb573d0f5ff # v4.9.1
         with:
           config: cliff-release.toml
-          args: --unreleased --context
+          args: ${{ steps.kind.outputs.kind == 'rc' && format('{0}..{1}', github.event.before, github.sha) || '--unreleased' }} --context
         env:
           OUTPUT: user-facing.json
           GITHUB_REPO: ${{ github.repository }}
@@ -69,6 +86,7 @@ jobs:
         if: ${{ steps.userfacing.outputs.count != '0' }}
         shell: bash
         env:
+          RELEASE_KIND: ${{ steps.kind.outputs.kind }}
           CLIFF_BUMPED_VERSION: ${{ steps.cliff_bumped.outputs.content }}
         run: bash scripts/resolve-version.sh
 
@@ -84,7 +102,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Generate CHANGELOG.md (git-cliff)
-        if: ${{ steps.bump.outputs.released == 'true' }}
+        if: ${{ steps.bump.outputs.released == 'true' && steps.kind.outputs.kind == 'stable' }}
         uses: orhun/git-cliff-action@a9a95522b26fe6403f7bb24031f21fb573d0f5ff # v4.9.1
         with:
           config: cliff.toml
@@ -94,18 +112,18 @@ jobs:
           GITHUB_REPO: ${{ github.repository }}
 
       - name: Stage changelog
-        if: ${{ steps.bump.outputs.released == 'true' }}
+        if: ${{ steps.bump.outputs.released == 'true' && steps.kind.outputs.kind == 'stable' }}
         run: git add CHANGELOG.md
 
       - name: Commit release (verified)
-        if: ${{ steps.bump.outputs.released == 'true' }}
+        if: ${{ steps.bump.outputs.released == 'true' && steps.kind.outputs.kind == 'stable' }}
         uses: qoomon/actions--create-commit@7102b1a8b3cb8716dc70dbeb6d774c375d779d2f # v1.2.5
         with:
           message: 'chore(release): ${{ steps.bump.outputs.tag }} [skip ci]'
           skip-empty: true
 
       - name: Push commit
-        if: ${{ steps.bump.outputs.released == 'true' }}
+        if: ${{ steps.bump.outputs.released == 'true' && steps.kind.outputs.kind == 'stable' }}
         run: git push
 
       - name: Create tag
@@ -147,13 +165,15 @@ jobs:
             dockerfile: Dockerfile
             tags: |
               type=raw,value=${{ needs.prepare-release.outputs.version }}
-              type=raw,value=latest
+              type=raw,value=latest,enable=${{ needs.prepare-release.outputs.prerelease != 'true' }}
+              type=raw,value=next,enable=${{ needs.prepare-release.outputs.prerelease == 'true' }}
             description: Dockerized Argon ONE fan-control and power-button driver for non-Raspberry Pi OS distributions
           - variant: systemd
             dockerfile: Dockerfile.systemd
             tags: |
               type=raw,value=${{ needs.prepare-release.outputs.version }}-systemd
-              type=raw,value=systemd
+              type=raw,value=systemd,enable=${{ needs.prepare-release.outputs.prerelease != 'true' }}
+              type=raw,value=next-systemd,enable=${{ needs.prepare-release.outputs.prerelease == 'true' }}
             description: Argon ONE fan-control and power-button driver (systemd variant, requires --privileged)
     steps:
       - name: Checkout tag
@@ -243,3 +263,5 @@ jobs:
           tag_name: ${{ needs.prepare-release.outputs.tag }}
           name: ${{ needs.prepare-release.outputs.tag }}
           body_path: release-notes.md
+          prerelease: ${{ needs.prepare-release.outputs.prerelease }}
+          make_latest: ${{ needs.prepare-release.outputs.prerelease != 'true' }}
