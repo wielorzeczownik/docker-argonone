@@ -5,6 +5,45 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.8](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.7...v2.1.8) - 2026-10-26
+
+### Bug Fixes
+
+- Match breaking changes by field so they get their own section ([6bb69d5](https://github.com/wielorzeczownik/docker-argonone/commit/6bb69d567ee25645cfd796384e4a488f1c4e7cfd))
+- Group fix(deps) updates under dependencies ([b8f113f](https://github.com/wielorzeczownik/docker-argonone/commit/b8f113f8c067360b25edf9d56162a9b44270c58b))
+
+### Documentation
+
+- Explain how to verify attestations in release notes ([bb3f8a1](https://github.com/wielorzeczownik/docker-argonone/commit/bb3f8a1065aa24765342cf5668e75bc77842705d))
+- Use shared pull request template from .github ([86b0671](https://github.com/wielorzeczownik/docker-argonone/commit/86b0671c270863b7bc7aa2c782b4cb17bce3843e))
+- Use shared code of conduct from .github ([8165ff5](https://github.com/wielorzeczownik/docker-argonone/commit/8165ff58420dbb67942298f296b5673af18b0c07))
+
+### Build System
+
+- Drop rules covered by shared preset ([a1b9ace](https://github.com/wielorzeczownik/docker-argonone/commit/a1b9acea830557c13336b06b444b87d7ff622a83))
+- Drop rules covered by shared preset ([e631f0e](https://github.com/wielorzeczownik/docker-argonone/commit/e631f0e3c64281243a00c274a21f6d156cd0d8c1))
+- Drop unused pip version manager ([e030bfd](https://github.com/wielorzeczownik/docker-argonone/commit/e030bfd48aab052b1f7dd4aec6760542e445fe71))
+- Drop descriptions ([93ce80c](https://github.com/wielorzeczownik/docker-argonone/commit/93ce80c9d4036d68bd717f4380e1accac580eea2))
+- Extend shared preset from .github ([b76379e](https://github.com/wielorzeczownik/docker-argonone/commit/b76379eb3fa1c5a182bea9a209b944d83ecc5190))
+- Open one pull request per dependency (#153) ([348bdd6](https://github.com/wielorzeczownik/docker-argonone/commit/348bdd6f1b0992fcb7df0e579099750b7e64b0e5))
+- Lock python dependencies with uv ([5d52802](https://github.com/wielorzeczownik/docker-argonone/commit/5d52802742c2d3ea3403ed71513801263b2cee6f))
+
+### CI/CD
+
+- Cut release candidates on push and stable releases weekly (#155) ([c1a1123](https://github.com/wielorzeczownik/docker-argonone/commit/c1a11230e3b2f32e5b6f6c107a63e5c159e17126))
+- Move pinned tool versions to workflow env ([2c9b4f6](https://github.com/wielorzeczownik/docker-argonone/commit/2c9b4f6adfa20f28157009b25ee900606842f842))
+- Hand dependency fixes to renovate (#151) ([c9c76a6](https://github.com/wielorzeczownik/docker-argonone/commit/c9c76a6f42d31f5c5caad6b7760128103531bbec))
+- Build image variants in parallel on arm runners (#150) ([181540c](https://github.com/wielorzeczownik/docker-argonone/commit/181540c3458dea5bf99cbf63ac6adaafde9d90f3))
+- Merge light checks into one job and render pip-audit reports ([98efbf2](https://github.com/wielorzeczownik/docker-argonone/commit/98efbf21d82c168fe1225385949e7211f4248960))
+- Batch updates weekly and skip bot PRs in label/assign ([586a2d3](https://github.com/wielorzeczownik/docker-argonone/commit/586a2d38f491c7ea9fc77dd06012ae8b75cf05f7))
+- Update taiki-e/install-action action to v2.87.27 (#147) ([5e09d4c](https://github.com/wielorzeczownik/docker-argonone/commit/5e09d4c06cca4edd782e0daa94d513ce78f43ad3))
+
+### Dependencies
+
+- Update ubuntu:26.04 docker digest to c098726 (#156) ([705e297](https://github.com/wielorzeczownik/docker-argonone/commit/705e297d5778c66111422cbf3c05521b94e7e5a1))
+- Update dependency ruff to v0.17.2 (#157) ([b1a1d66](https://github.com/wielorzeczownik/docker-argonone/commit/b1a1d665d8cd3910c31f22ef46614f62e1b8aab2))
+- Update dependency ruff to v0.17.1 (#152) ([f6bac19](https://github.com/wielorzeczownik/docker-argonone/commit/f6bac19d8c2e45b853f813da266fef0b7711eb4a))
+
 ## [2.1.7](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.6...v2.1.7) - 2026-10-14
 
 ### CI/CD
@@ -349,7 +388,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.0](https://github.com/wielorzeczownik/docker-argonone/compare/v1.1.0...v2.0.0) - 2026-04-26
 
-### Features
+### Breaking Changes
 
 - Replace systemd with direct Python daemon as PID 1 ([e347ac0](https://github.com/wielorzeczownik/docker-argonone/commit/e347ac03bea4f3ceb350bd0151d116505c04147c))
 
