@@ -23,7 +23,7 @@ concurrency:
 jobs:
   prepare-release:
     name: Prepare release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     permissions:
       contents: write
@@ -151,7 +151,7 @@ jobs:
       deployment: false
     needs: prepare-release
     if: ${{ needs.prepare-release.outputs.released == 'true' }}
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     timeout-minutes: 45
     permissions:
       contents: read
@@ -246,7 +246,7 @@ jobs:
       - prepare-release
       - image
     if: ${{ needs.prepare-release.outputs.released == 'true' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       contents: write
