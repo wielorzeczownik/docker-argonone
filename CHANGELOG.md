@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.9](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.8...v2.1.9) - 2026-10-31
+
+### Security
+
+- Drop unused pebble and software-properties-common [security] (#162) ([672e6e7](https://github.com/wielorzeczownik/docker-argonone/commit/672e6e7a804c5e0afc2d1de689a92ca7e47c46a4))
+
+### CI/CD
+
+- Update taiki-e/install-action action to v2.87.29 (#159) ([927bb2f](https://github.com/wielorzeczownik/docker-argonone/commit/927bb2fb9d2f39b75422d842ebeec596296c432f))
+- Update dependency astral-sh/uv to v0.13.5 (#158) ([f424488](https://github.com/wielorzeczownik/docker-argonone/commit/f424488dcdad227f04abcb9d5148545eff26934d))
+
 ## [2.1.8](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.7...v2.1.8) - 2026-10-26
 
 ### Bug Fixes
