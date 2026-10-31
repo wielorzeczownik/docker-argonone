@@ -1,4 +1,4 @@
-FROM ubuntu:26.04@sha256:c098726dd9b9733f3e885f8de0ef375206a311b0a317eadc40d347b1115fb944
+FROM ubuntu:26.04@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -14,28 +14,24 @@ LABEL org.opencontainers.image.source="https://github.com/wielorzeczownik/docker
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install deps, tune systemd for a container (drop timers, multi-user target, journal to stdout),
+# install Argon ONE, enable the daemon service, purge build-time tools and drop the unused
+# Go-based pebble binary, all in one layer
 # hadolint ignore=DL3008
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends sudo systemd wget ca-certificates software-properties-common \
-  && add-apt-repository -y universe \
-  && apt-get update \
-  && apt-get install -y --no-install-recommends python3-libgpiod python3-smbus \
-  && rm -rf /var/lib/apt/lists/*
-
-# Tune systemd for a container (drop timers, multi-user target, journal to stdout),
-# install Argon ONE, enable the daemon service, purge build-time tools
-RUN find /etc/systemd -name '*.timer' -print0 | xargs -0 rm -v || true \
+  && apt-get install -y --no-install-recommends sudo systemd wget ca-certificates python3-libgpiod python3-smbus \
+  && rm -rf /var/lib/apt/lists/* \
+  && { find /etc/systemd -name '*.timer' -print0 | xargs -0 rm -v || true; } \
   && systemctl set-default multi-user.target \
   && printf '[Journal]\nForwardToConsole=yes\n' >> /etc/systemd/journald.conf \
   && wget -qO /tmp/argon1.sh "${ARGON_SCRIPT_URL}" \
   && chmod +x /tmp/argon1.sh \
   && /tmp/argon1.sh \
-  && rm /tmp/argon1.sh \
   && systemctl enable argononed \
-  && apt-get purge -y wget software-properties-common \
+  && apt-get purge -y wget \
   && apt-get autoremove -y \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  && rm -rf /usr/bin/pebble /var/lib/pebble /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY --chmod=755 patches/argononed.py /etc/argon/argononed.py
 COPY --chmod=755 patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
