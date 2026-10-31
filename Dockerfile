@@ -1,4 +1,4 @@
-FROM ubuntu:26.04@sha256:c098726dd9b9733f3e885f8de0ef375206a311b0a317eadc40d347b1115fb944
+FROM ubuntu:26.04@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -14,26 +14,22 @@ LABEL org.opencontainers.image.source="https://github.com/wielorzeczownik/docker
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install deps, stub sudo/systemctl so argon1.sh runs without systemd, install Argon ONE,
+# purge build-time tools and drop the unused Go-based pebble binary, all in one layer
 # hadolint ignore=DL3008
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends wget ca-certificates software-properties-common \
-  && add-apt-repository -y universe \
-  && apt-get update \
-  && apt-get install -y --no-install-recommends python3-libgpiod python3-smbus \
-  && rm -rf /var/lib/apt/lists/*
-
-# Stubs so argon1.sh runs without systemd or sudo; install Argon ONE; purge build-time tools
-RUN printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo \
+  && apt-get install -y --no-install-recommends wget ca-certificates python3-libgpiod python3-smbus \
+  && rm -rf /var/lib/apt/lists/* \
+  && printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo \
   && printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/systemctl \
   && chmod +x /usr/local/bin/sudo /usr/local/bin/systemctl \
   && wget -qO /tmp/argon1.sh "${ARGON_SCRIPT_URL}" \
   && chmod +x /tmp/argon1.sh \
   && /tmp/argon1.sh \
-  && rm /tmp/argon1.sh \
-  && apt-get purge -y wget software-properties-common \
+  && apt-get purge -y wget \
   && apt-get autoremove -y \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  && rm -rf /usr/bin/pebble /var/lib/pebble /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY --chmod=755 patches/argononed.py /etc/argon/argononed.py
 COPY --chmod=755 patches/argonone-fanconfig.sh /etc/argon/argonone-fanconfig.sh
