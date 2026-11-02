@@ -3,6 +3,10 @@
   "extends": ["github>wielorzeczownik/.github"],
   "packageRules": [
     {
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "semanticCommitType": "chore"
+    },
+    {
       "matchManagers": ["dockerfile"],
       "matchPackageNames": ["ubuntu"],
       "groupName": "ubuntu base image"
