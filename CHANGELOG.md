@@ -5,6 +5,33 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.10](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.9...v2.1.10) - 2026-11-16
+
+### CI/CD
+
+- Update taiki-e/install-action action to v2.89.1 (#174) ([c783505](https://github.com/wielorzeczownik/docker-argonone/commit/c7835056c129d00f8aa4e0d2c9ae030ee74b0d07))
+- Update dependency astral-sh/uv to v0.13.7 (#173) ([b00e2de](https://github.com/wielorzeczownik/docker-argonone/commit/b00e2def0cdeeecdd6338ab9f03ad78605ad5445))
+- Update astral-sh/setup-uv action to v10.3.3 (#172) ([d8a93b7](https://github.com/wielorzeczownik/docker-argonone/commit/d8a93b7162c7b92971a7a8f38ca23928b0b7c3ab))
+- Create lightweight tags ([0efa9b9](https://github.com/wielorzeczownik/docker-argonone/commit/0efa9b9c7cb8fbd6971e78989898cd8b99266873))
+- Update dependency astral-sh/uv to v0.13.6 (#165) ([e8ed3d0](https://github.com/wielorzeczownik/docker-argonone/commit/e8ed3d072252031a9cb92de1725ab56608a78cff))
+- Update taiki-e/install-action action to v2.87.31 (#166) ([12162d8](https://github.com/wielorzeczownik/docker-argonone/commit/12162d86117a66edbfd320d9fa1fb97a1a726b22))
+- Update davidanson/markdownlint-cli2-action action to v25 (#169) ([5039b1b](https://github.com/wielorzeczownik/docker-argonone/commit/5039b1b108192f340516a0e99d050f46633ec2c4))
+- Update pozil/auto-assign-issue action to v4.1.0 (#168) ([e17d1fd](https://github.com/wielorzeczownik/docker-argonone/commit/e17d1fd1290e60416ad34f748d5f920ffc551769))
+- Update docker/login-action action to v4.7.0 (#167) ([af2b4c9](https://github.com/wielorzeczownik/docker-argonone/commit/af2b4c915d4d103cdec916a26ef218e8a6a8b3de))
+- Update astral-sh/setup-uv action to v10.3.2 (#164) ([db64c8d](https://github.com/wielorzeczownik/docker-argonone/commit/db64c8d037b1c99b207d15332c24062727a6acf2))
+
+### Dependencies
+
+- Update ubuntu:26.04 docker digest to d66b366 (#176) ([ffc27bb](https://github.com/wielorzeczownik/docker-argonone/commit/ffc27bbba897a43107b0b17285ac40e103ebaafb))
+- Update dependency ruff to v0.17.5 (#177) ([77507f0](https://github.com/wielorzeczownik/docker-argonone/commit/77507f00fd869735969a348f7630ec4cec061a5b))
+- Lock file maintenance (#175) ([00bb270](https://github.com/wielorzeczownik/docker-argonone/commit/00bb27079cb27ff760160a0cf2ca2422637df83e))
+- Update dependency ruff to v0.17.4 (#171) ([21938f1](https://github.com/wielorzeczownik/docker-argonone/commit/21938f120636f15332d5c3f4a3a5c4184c609b57))
+- Update python tooling (#163) ([179b20e](https://github.com/wielorzeczownik/docker-argonone/commit/179b20e07c836a8dd6163880f80c9cda11e2e8c5))
+
+### Miscellaneous
+
+- Keep lock file maintenance as chore (#170) ([7e522ce](https://github.com/wielorzeczownik/docker-argonone/commit/7e522ce65e5dac29a0919bb991304de1a73a7b6c))
+
 ## [2.1.9](https://github.com/wielorzeczownik/docker-argonone/compare/v2.1.8...v2.1.9) - 2026-10-31
 
 ### Security
