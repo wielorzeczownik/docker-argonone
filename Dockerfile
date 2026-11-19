@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source="https://github.com/wielorzeczownik/docker
   org.opencontainers.image.url="https://github.com/wielorzeczownik/docker-argonone" \
   org.opencontainers.image.documentation="https://github.com/wielorzeczownik/docker-argonone#readme" \
   org.opencontainers.image.title="docker-argonone" \
-  org.opencontainers.image.description="Dockerized Argon ONE fan-control and power-button driver for non‑Raspberry Pi OS distributions" \
+  org.opencontainers.image.description="Fan control for the Argon ONE case on Raspberry Pi 4 and 5, on any Linux distribution" \
   org.opencontainers.image.authors="wielorzeczownik" \
   org.opencontainers.image.vendor="wielorzeczownik"
 
