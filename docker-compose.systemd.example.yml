@@ -1,0 +1,13 @@
+services:
+  argonone:
+    image: wielorzeczownik/argonone:systemd
+    container_name: argonone
+    # needed so the power button can shut down the host
+    privileged: true
+    devices:
+      - /dev/i2c-1:/dev/i2c-1
+      # Raspberry Pi 5: /dev/gpiochip4:/dev/gpiochip4
+      - /dev/gpiochip0:/dev/gpiochip0
+    volumes:
+      - ./argononed.conf:/etc/argononed.conf:ro
+    restart: unless-stopped
