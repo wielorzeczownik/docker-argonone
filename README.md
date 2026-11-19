@@ -8,181 +8,83 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/master/assets/logo.png" alt="Dockerized Argon ONE logo" width="520" />
+  <img src="https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/master/assets/logo.svg" alt="docker-argonone logo" width="420"/>
 </p>
 
-Dockerized Argon ONE fan-control and power-button driver for Raspberry Pi 4 and Raspberry Pi 5 – runs on any Linux distribution, no Raspberry Pi OS required.
+Fan control for the [Argon ONE](https://argon40.com) case on Raspberry Pi 4 and 5, packed into a Docker image. It runs on any Linux distribution, so you don't need Raspberry Pi OS.
 
-> Based on the work of [johnmerchant](https://github.com/johnmerchant/docker-argonone) with patches included:
->
-> - `argononed.py` – daemon respects low PWM duty cycles (<25%) without a forced 100% spin-up; logs CPU temperature and fan speed to `docker logs`,
-> - `argonone-fanconfig.sh` – fan config accepts 0-100% duty cycle (no 30% floor).
+It's based on [johnmerchant/docker-argonone](https://github.com/johnmerchant/docker-argonone), with a few fixes to the upstream daemon, listed [below](#changes-from-upstream).
 
-## Variants
+There are two images:
 
-Two images are published from the same daemon and patches. Pick based on whether you need the power button.
+| Image                              | Access                 | Power button                    |
+| ---------------------------------- | ---------------------- | ------------------------------- |
+| `wielorzeczownik/argonone:latest`  | `--device` (I2C, GPIO) | doesn't shut down or reboot     |
+| `wielorzeczownik/argonone:systemd` | `--privileged`         | shuts down and reboots the host |
 
-| Variant                | Docker image                       | Container access        | Power button             |
-| ---------------------- | ---------------------------------- | ----------------------- | ------------------------ |
-| **Standard** (default) | `wielorzeczownik/argonone:latest`  | `--device` (I2C + GPIO) | ❌ fan control only      |
-| **systemd**            | `wielorzeczownik/argonone:systemd` | `--privileged`          | ✅ shutdown/reboot works |
-
-Fan control is identical in both. The **Standard** image runs the daemon directly as PID 1 and only needs the two device nodes. The **systemd** image runs systemd as PID 1 so the Argon ONE power button can trigger an OS shutdown/reboot, at the cost of requiring `--privileged`.
+Fan control works the same in both. Use `latest` unless you need the power button.
 
 > [!WARNING]
-> The systemd variant runs with `--privileged`, granting the container broad host access. Use the Standard image unless you specifically need power-button shutdown.
+> `--privileged` gives the container broad access to the host. Only use the `systemd` image if you actually want the button to work.
 
-## Run
+## Host setup
 
-Pass `/dev/i2c-1` so the daemon can reach the Argon ONE MCU over I2C, and `/dev/gpiochip0` for power button GPIO.
+The daemon talks to the case over I2C, so turn it on before starting the container:
 
-### Docker Compose
+1. Add `dtparam=i2c_arm=on` to `/boot/firmware/config.txt` (Pi 5) or `/boot/config.txt` (Pi 4).
+2. Load the module with `modprobe i2c-dev`.
+3. To load it on every boot, add `i2c-dev` to `/etc/modules-load.d/i2c.conf`.
 
-```yaml
-services:
-  argonone:
-    image: wielorzeczownik/argonone:latest
-    container_name: argonone
-    restart: unless-stopped
-    devices:
-      - /dev/i2c-1:/dev/i2c-1
-      - /dev/gpiochip0:/dev/gpiochip0
-    volumes:
-      - ./argononed.conf:/etc/argononed.conf:ro
-```
+## Running
 
-```sh
-docker compose up -d
-```
-
-### Docker Run
+### Docker
 
 ```bash
-docker run -d \
-  --name argonone \
-  --restart unless-stopped \
-  --device /dev/i2c-1:/dev/i2c-1 \
-  --device /dev/gpiochip0:/dev/gpiochip0 \
-  -v $(pwd)/argononed.conf:/etc/argononed.conf:ro \
+curl -fsSL -o argononed.conf https://raw.githubusercontent.com/wielorzeczownik/docker-argonone/master/argononed.conf.example
+docker run -d --name argonone --restart unless-stopped \
+  --device /dev/i2c-1 --device /dev/gpiochip0 \
+  -v "$PWD/argononed.conf:/etc/argononed.conf:ro" \
   wielorzeczownik/argonone:latest
 ```
 
-## Raspberry Pi 5
+For Docker Compose, also grab [docker-compose.example.yml](docker-compose.example.yml), save it as `docker-compose.yml` and run `docker compose up -d`.
 
-Raspberry Pi 5 moves the user-facing GPIO lines to the RP1 I/O chip, exposed as `/dev/gpiochip4` instead of `/dev/gpiochip0` used on earlier models. Add one extra device entry – everything else stays the same.
+On the Raspberry Pi 5 the GPIO lines sit on the RP1 chip, so pass `/dev/gpiochip4` instead of `/dev/gpiochip0`. The image detects the board on its own.
 
-Docker Compose:
+### Power button
 
-```yaml
-devices:
-  - /dev/i2c-1:/dev/i2c-1
-  - /dev/gpiochip4:/dev/gpiochip4
-```
-
-Docker Run:
-
-```bash
-docker run -d \
-  --name argonone \
-  --restart unless-stopped \
-  --device /dev/i2c-1:/dev/i2c-1 \
-  --device /dev/gpiochip4:/dev/gpiochip4 \
-  -v $(pwd)/argononed.conf:/etc/argononed.conf:ro \
-  wielorzeczownik/argonone:latest
-```
-
-The same image works for both RPi 4 and RPi 5 – the Argon ONE installer auto-detects the board model from `/proc/cpuinfo`, which is passed through from the host in Docker.
-
-## systemd variant (power button)
-
-To use the power button for OS shutdown/reboot, run the `:systemd` image with `--privileged`. The device nodes and the Raspberry Pi 5 note above still apply – only the tag and `--privileged` change.
-
-### Docker Compose (systemd)
-
-```yaml
-services:
-  argonone:
-    image: wielorzeczownik/argonone:systemd
-    container_name: argonone
-    restart: unless-stopped
-    privileged: true
-    devices:
-      - /dev/i2c-1:/dev/i2c-1
-      - /dev/gpiochip0:/dev/gpiochip0
-    volumes:
-      - ./argononed.conf:/etc/argononed.conf:ro
-```
-
-### Docker Run (systemd)
-
-```bash
-docker run -d \
-  --name argonone \
-  --restart unless-stopped \
-  --privileged \
-  --device /dev/i2c-1:/dev/i2c-1 \
-  --device /dev/gpiochip0:/dev/gpiochip0 \
-  -v $(pwd)/argononed.conf:/etc/argononed.conf:ro \
-  wielorzeczownik/argonone:systemd
-```
+Use [docker-compose.systemd.example.yml](docker-compose.systemd.example.yml), or add `--privileged` to the command above and change the tag to `:systemd`.
 
 ## Configuration
 
-### Runtime inputs
+The image reads no environment variables. Everything comes from devices and the config file.
 
-| Input                 | Required             | Default              | Meaning                                                                      |
-| --------------------- | -------------------- | -------------------- | ---------------------------------------------------------------------------- |
-| `/dev/i2c-1`          | yes                  | –                    | I2C bus the Argon ONE MCU sits on. The daemon exits without it.              |
-| `/dev/gpiochip0`      | for the power button | –                    | GPIO chip carrying the power-button line on Raspberry Pi 4 and earlier.      |
-| `/dev/gpiochip4`      | for the power button | –                    | GPIO chip on Raspberry Pi 5, where the lines moved to the RP1 I/O chip.      |
-| `/etc/argononed.conf` | no                   | 55=10, 60=55, 65=100 | Temperature-to-fan-speed map. Mount read-only; see the table below.          |
-| `--privileged`        | systemd variant only | off                  | Required by the `:systemd` image so the power button can shut the host down. |
+| Input                 | Required        | Default              | Meaning                                          |
+| --------------------- | --------------- | -------------------- | ------------------------------------------------ |
+| `/dev/i2c-1`          | yes             | -                    | I2C bus of the case, the daemon exits without it |
+| `/dev/gpiochip0`      | for the button  | -                    | GPIO chip with the button line on the Pi 4       |
+| `/dev/gpiochip4`      | for the button  | -                    | GPIO chip with the button line on the Pi 5       |
+| `/etc/argononed.conf` | no              | `55=10 60=55 65=100` | fan curve, see [below](#fan-curve)               |
+| `--privileged`        | `:systemd` only | off                  | lets the button shut down the host               |
 
-The image reads no environment variables. Everything it needs comes from the
-device nodes and the mounted config file.
+### Fan curve
 
-### Build arguments
-
-Only relevant if you build the image yourself.
-
-| Argument           | Required | Default                                  | Meaning                                                |
-| ------------------ | -------- | ---------------------------------------- | ------------------------------------------------------ |
-| `ARGON_SCRIPT_URL` | no       | `https://download.argon40.com/argon1.sh` | Upstream Argon ONE installer fetched during the build. |
-
-## Fan configuration
-
-`/etc/argononed.conf` maps temperature thresholds (°C) to fan speed percentages. Default template:
+[argononed.conf.example](argononed.conf.example) maps temperature (°C) to fan speed (%). Each line means "from this temperature up, run at this speed":
 
 ```ini
-#
-# Argon ONE Fan Configuration
-#
-# List below the temperature (Celsius) and fan speed (in percent) pairs
-# Use the following form:
-# min.temperature=speed
-#
-# Example:
-# 55=10
-# 60=55
-# 65=100
-#
-# NOTE: Lines beginning with # are ignored
-#
-# Apply changes with: docker restart argonone
-#
 55=10
 60=55
 65=100
 ```
 
-Mount the file read-only (`:ro`) to avoid accidental edits inside the container. Values of `0` are honored (fan fully off) – no 30% floor is enforced.
+Lines starting with `#` are ignored. Any speed from `0` to `100` works, `0` means the fan is off. After editing, run `docker restart argonone`.
 
-## Host requirements
+## Changes from upstream
 
-Enable I2C on the host before starting the container:
+The patched files are in [patches/](patches), with every change described in [PATCHES.md](patches/PATCHES.md).
 
-- Add `dtparam=i2c_arm=on` to `/boot/firmware/config.txt` (RPi 5) or `/boot/config.txt` (RPi 4)
-- Load the kernel module: `modprobe i2c-dev`
-- Optionally persist it: add `i2c-dev` to `/etc/modules-load.d/i2c.conf`
-
-On Raspberry Pi 5, GPIO access goes through `libgpiod` and `/dev/gpiochip4`.
+- Speeds below 25% are respected. Upstream spins the fan up to 100% first, which makes quiet profiles impossible.
+- `argonone-fanconfig.sh` accepts 0 to 100%, upstream won't go below 30%.
+- The daemon logs temperature and fan speed to `docker logs`.
+- A failed I2C write no longer makes the daemon skip later speed changes.
+- The daemon no longer exits after one loop when it runs without systemd.

@@ -1,0 +1,9 @@
+# Argon ONE fan curve
+#
+# One pair per line: temperature (Celsius) = fan speed (0-100 percent).
+# From each temperature up, the fan runs at that speed. Below the lowest one it's off.
+# Apply changes with: docker restart argonone
+
+55=10
+60=55
+65=100

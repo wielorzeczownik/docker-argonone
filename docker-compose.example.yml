@@ -1,0 +1,11 @@
+services:
+  argonone:
+    image: wielorzeczownik/argonone:latest
+    container_name: argonone
+    devices:
+      - /dev/i2c-1:/dev/i2c-1
+      # Raspberry Pi 5: /dev/gpiochip4:/dev/gpiochip4
+      - /dev/gpiochip0:/dev/gpiochip0
+    volumes:
+      - ./argononed.conf:/etc/argononed.conf:ro
+    restart: unless-stopped
