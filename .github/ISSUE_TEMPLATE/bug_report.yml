@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Before reporting, check if the issue already exists in [open issues](https://github.com/wielorzeczownik/docker-argonone/issues).
+        Thanks for reporting. Any detail helps, but don't worry if you don't know all of it. If you have a moment, a quick look through [open issues](https://github.com/wielorzeczownik/docker-argonone/issues) helps avoid duplicates.
 
   - type: textarea
     id: description
@@ -19,32 +19,24 @@ body:
     id: expected
     attributes:
       label: What did you expect?
-    validations:
-      required: true
 
   - type: input
     id: hardware
     attributes:
       label: Hardware
       placeholder: 'e.g. Raspberry Pi 4, Argon ONE M.2'
-    validations:
-      required: true
 
   - type: input
     id: os
     attributes:
       label: Operating system
       placeholder: 'e.g. Ubuntu 24.04, Debian Bookworm'
-    validations:
-      required: true
 
   - type: input
     id: docker_version
     attributes:
       label: Docker version
       placeholder: 'e.g. 27.0.0'
-    validations:
-      required: true
 
   - type: input
     id: image_version
