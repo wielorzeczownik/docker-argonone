@@ -1,6 +1,6 @@
 services:
   argonone:
-    image: wielorzeczownik/argonone:latest
+    image: wielorzeczownik/argonone:latest@sha256:d21e70c1e9a4151fee9b83864e6c7328e456b671bfea566d0f7e3d98dc025e9f
     container_name: argonone
     devices:
       - /dev/i2c-1:/dev/i2c-1
