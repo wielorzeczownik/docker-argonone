@@ -1,39 +1,10 @@
-# Contributing to docker-argonone
+# Contributing
 
-Thank you for considering a contribution. This document covers everything you need to get started.
+Every contribution helps, including a typo fix, a bug report, or a question about how something works. For anything bigger than a small fix, opening an issue first is a good idea, so we can agree on the approach before you spend time on it.
 
-## Overview
+One thing to know up front: the image downloads and runs the upstream Argon ONE installer, then patches two of its scripts to remove the fan speed floors that make quiet profiles impossible. The patched copies live in `patches/`, and [patches/PATCHES.md](patches/PATCHES.md) lists every change and why. Keep changes there minimal, without reformatting, so the diff against upstream stays readable.
 
-This project packages the [Argon ONE](https://www.argon40.com/) fan-control and power-button daemon as a Docker container. The upstream installer script (`argon1.sh`) is downloaded and run during the image build; two of its scripts are patched before shipping to remove artificial fan speed floors that make quiet profiles impossible. See [`patches/PATCHES.md`](patches/PATCHES.md) for the full list of changes and their rationale.
-
-## Project structure
-
-```text
-.
-├── Dockerfile                    image definition (standard variant)
-├── Dockerfile.systemd            image definition (systemd variant)
-├── healthcheck.py                container healthcheck script
-├── pyproject.toml                dev tool groups (lint: ruff, mypy, dev: lint + pytest)
-├── uv.lock                       every tool and transitive dependency, pinned with hashes
-├── patches/
-│   ├── argononed.py              patched Argon ONE daemon (derived from upstream)
-│   ├── argonone-fanconfig.sh     patched fan config tool (derived from upstream)
-│   ├── PATCHES.md                documents every change and why
-│   ├── ruff.toml                 relaxed lint rules for upstream-derived code
-│   └── upstream.sha256           SHA-256 hashes of the upstream files
-├── scripts/
-│   ├── check-upstream.py         verifies upstream files have not changed
-│   ├── update-upstream.py        refreshes upstream.sha256 after updating patches
-│   ├── resolve-version.sh        determines next release version from git-cliff
-│   └── upstream-drift.sh         wraps the drift check for the drift workflow
-└── tests/
-    ├── conftest.py               mocks argon hardware modules for unit tests
-    └── test_argononed.py         unit tests for patched daemon logic
-```
-
-> Files in `patches/` are modifications of upstream files. Keep changes minimal and focused – do not reformat or restructure beyond what is necessary.
-
-## Development setup
+## Setup
 
 ```bash
 git clone https://github.com/wielorzeczownik/docker-argonone.git
@@ -41,83 +12,48 @@ cd docker-argonone
 uv sync
 ```
 
-## Running checks locally
+## Checks
 
-Every command below is exactly what CI runs. All of them must pass before a pull
-request can merge.
+CI runs these on every pull request. You don't have to run them all locally, since CI will point out anything that's off:
 
 ```bash
-# Dockerfile lint
 hadolint Dockerfile
 hadolint Dockerfile.systemd
 
-# Python lint, format, types, tests
-ruff check scripts/ tests/ healthcheck.py
-ruff check patches/
-ruff format --check scripts/ tests/ healthcheck.py
-mypy scripts/ healthcheck.py
-pytest tests/ -v
+uv run --locked ruff check scripts/ tests/ healthcheck.py
+uv run --locked ruff check patches/
+uv run --locked ruff format --check scripts/ tests/ healthcheck.py
+uv run --locked mypy scripts/ healthcheck.py
+uv run --locked pytest tests/ -v
 
-# Shell
 shfmt --diff scripts/
 shellcheck scripts/*.sh
-
-# Workflows
 actionlint
-
-# Formatting and markup
-npx --yes prettier@3.9.6 --check .
+npx prettier --check .
 markdownlint-cli2 "**/*.md"
 
-# Upstream drift
 python3 scripts/check-upstream.py
 ```
 
-### What is deliberately excluded, and why
+Some paths are left out of some checks on purpose:
 
-| Path                 | Excluded from                       | Reason                                                                                                                       |
-| -------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `patches/`           | `ruff format`, Prettier, shellcheck | Upstream-derived. Reformatting changes the diff against upstream and defeats the drift check in `scripts/check-upstream.py`. |
-| `patches/`           | strict ruff rules                   | Has its own `patches/ruff.toml` selecting `F` only, so genuine errors surface without a wall of style suppressions.          |
-| `tests/`             | mypy                                | The daemon under test is loaded through `importlib` from `patches/`, so every symbol is `Any` and strict mode cannot help.   |
-| `CHANGELOG.md`       | markdownlint, Prettier              | Generated by git-cliff from commit messages. Never hand-edit it; if it is wrong, a commit message was wrong.                 |
-| `.github/*-issue.md` | Prettier                            | Handlebars front matter that Prettier reflows.                                                                               |
+| Path                 | Left out of                         | Why                                                                                                        |
+| -------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `patches/`           | `ruff format`, Prettier, shellcheck | Derived from upstream. Reformatting would change the diff against upstream and break the drift check.      |
+| `patches/`           | strict ruff rules                   | Its own `patches/ruff.toml` selects only `F`, so real errors show up without a wall of style suppressions. |
+| `tests/`             | mypy                                | The daemon under test is loaded through `importlib` from `patches/`, so every symbol is `Any`.             |
+| `CHANGELOG.md`       | markdownlint, Prettier              | Generated by git-cliff from commit messages.                                                               |
+| `.github/*-issue.md` | Prettier                            | Handlebars front matter that Prettier reflows.                                                             |
 
-Test code is otherwise linted with the same rules as production code – `tests/`
-only relaxes `S101`, because `assert` is how pytest works.
+## Tests
 
-### With Docker (no local installs required)
-
-```bash
-docker run --rm -v "$(pwd):/src" -w /src hadolint/hadolint hadolint Dockerfile
-
-docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff check scripts/ tests/ healthcheck.py
-docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/ruff format --check scripts/ tests/ healthcheck.py
-
-docker run --rm -v "$(pwd):/src" -w /src ghcr.io/astral-sh/uv:python3.12-bookworm uv run --locked mypy scripts/ healthcheck.py
-
-docker run --rm -v "$(pwd):/src" -w /src mvdan/shfmt --diff scripts/
-docker run --rm -v "$(pwd):/mnt" -w /mnt koalaman/shellcheck:stable scripts/*.sh
-
-docker run --rm -v "$(pwd):/repo" -w /repo rhysd/actionlint:1.7.12
-
-docker run --rm -v "$(pwd):/workdir" davidanson/markdownlint-cli2 "**/*.md"
-```
-
-## Running tests
-
-The unit tests cover the patched daemon logic (`get_fanspeed`, `load_config`) without requiring real hardware. Hardware modules are mocked in `tests/conftest.py`.
-
-```bash
-source .venv/bin/activate
-pytest tests/ -v
-```
+The tests in `tests/` cover the patched daemon logic (`get_fanspeed`, `load_config`) without real hardware. The hardware modules are mocked in `tests/conftest.py`. Otherwise tests follow the same lint rules as the rest of the code, except `S101`, since `assert` is how pytest works.
 
 ## Updating patches
 
-When the `upstream-drift` check fails, the upstream Argon ONE scripts have changed. To update:
+When the `upstream-drift` check fails, the upstream Argon ONE scripts have changed:
 
-1. Download the new upstream files and diff them against the current patches:
+1. Download the new upstream files and diff them against the patches:
 
    ```bash
    curl -fsSL https://download.argon40.com/scripts/argononed.py > /tmp/argononed.py
@@ -126,59 +62,18 @@ When the `upstream-drift` check fails, the upstream Argon ONE scripts have chang
    diff /tmp/argonone-fanconfig.sh patches/argonone-fanconfig.sh
    ```
 
-2. Re-apply every change described in [`patches/PATCHES.md`](patches/PATCHES.md) to the new upstream files.
+2. Re-apply every change from [patches/PATCHES.md](patches/PATCHES.md) to the new upstream files.
 
-3. Refresh the stored hashes:
+3. Refresh the stored hashes with `python3 scripts/update-upstream.py`.
 
-   ```bash
-   python3 scripts/update-upstream.py
-   ```
+4. Commit the patch files and `patches/upstream.sha256` together.
 
-4. Commit the updated patch files and `patches/upstream.sha256` together.
+## Commits and pull requests
 
-## Commit style
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat: ...`, `fix: ...`), because the changelog and version bumps are generated from them. Don't worry if you get the prefix wrong, it can be fixed before merging.
 
-This project uses [Conventional Commits](https://www.conventionalcommits.org/). Commit messages drive automatic changelog generation and version bumping.
+Smaller PRs that do one thing are easier to review. It helps to say how you tested the change, especially if you ran it on a real Pi. No hardware? Open the PR anyway and we'll work it out together.
 
-| Prefix      | When to use                         |
-| ----------- | ----------------------------------- |
-| `feat:`     | New feature or behavior             |
-| `fix:`      | Bug fix                             |
-| `perf:`     | Performance improvement             |
-| `test:`     | Adding or updating tests            |
-| `chore:`    | Maintenance, dependency updates     |
-| `refactor:` | Code change without behavior change |
-| `docs:`     | Documentation only                  |
-| `style:`    | Formatting only, no behavior change |
-| `build:`    | Build system or dependencies        |
-| `ci:`       | CI/CD changes                       |
+Bugs and ideas go to [issues](https://github.com/wielorzeczownik/docker-argonone/issues). Security problems go through [SECURITY.md](SECURITY.md).
 
-Breaking changes carry `!` after the type and a `BREAKING CHANGE:` footer.
-
-Write the body to explain **why**, not what – the diff already says what. For a
-fix, state the failure mode it prevents. Wrap at 72–80 columns.
-
-Keep commits focused on a single concern. If a change touches both logic and tests, a single commit is fine – if it touches unrelated areas, split it.
-
-## Pull requests
-
-- Keep PRs focused on a single concern.
-- Reference any related issue in the PR description.
-- Say how you verified the change, not just what you changed.
-
-## Reporting bugs
-
-Open an [issue](https://github.com/wielorzeczownik/docker-argonone/issues) and include:
-
-- What you did
-- What you expected
-- What actually happened
-- Your hardware (Raspberry Pi model, OS)
-- Docker version
-- Relevant container logs (`docker logs argonone`)
-
-> For security issues, read [SECURITY.md](SECURITY.md) before opening a public issue.
-
-## License
-
-By contributing you agree that your changes will be licensed under the [MIT License](LICENSE).
+Contributions are licensed under the [MIT License](LICENSE).

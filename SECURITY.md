@@ -1,37 +1,19 @@
-# Security Policy
+# Security
 
-## Supported versions
+Thanks for taking the time to look. Please report vulnerabilities privately through [GitHub Security Advisories](https://github.com/wielorzeczownik/docker-argonone/security/advisories/new) instead of a public issue, so there's a chance to fix them first. You'll be credited in the release notes unless you'd rather not be. Only the latest release gets fixes.
 
-Only the latest release receives security fixes.
+## In scope
 
-## Reporting a vulnerability
+The container talks to hardware directly, so the scope is:
 
-**Do not open a public GitHub issue for security vulnerabilities.**
+- access to `/dev/i2c-1` (fan and MCU) and `/dev/gpiochip0` or `/dev/gpiochip4` (power button)
+- the daemon running as root (PID 1 in the standard image, under systemd in the systemd image)
+- the systemd image, which runs with `--privileged` so the power button can shut the host down
 
-Report vulnerabilities privately via [GitHub Security Advisories](https://github.com/wielorzeczownik/docker-argonone/security/advisories/new).
+Problems in the upstream Argon ONE daemon or its original scripts are out of scope.
 
-Include as much detail as possible:
+## Running it safely
 
-- Description of the vulnerability
-- Steps to reproduce
-- Potential impact
-- Suggested fix (if any)
-
-You will receive a response within **7 days**. If the issue is confirmed, a fix will be released as soon as possible and you will be credited in the release notes (unless you prefer to remain anonymous).
-
-## Scope
-
-This project runs a Docker container with direct access to hardware devices. The attack surface includes:
-
-- The container accesses `/dev/i2c-1` (fan/MCU communication) and `/dev/gpiochip0` or `/dev/gpiochip4` (power button GPIO)
-- The daemon communicates with hardware via I2C
-- The daemon runs as root (PID 1 in the Standard image; supervised by systemd in the systemd image)
-- The **systemd** image variant runs with `--privileged` (broad host access) to enable power-button shutdown; the default **Standard** image does not
-
-Issues related to the upstream Argon ONE daemon or the original scripts are out of scope.
-
-## Security notes
-
-- Prefer the **Standard** image: it does not require `--privileged`; grant only the specific device nodes it needs.
-- The **systemd** image requires `--privileged` and therefore has broad host access — use it only if you need power-button shutdown.
-- Keep the base image up to date.
+- Prefer the standard image. It doesn't need `--privileged`, only the device nodes listed above.
+- Use the systemd image only if you need power-button shutdown, since `--privileged` gives it broad access to the host.
+- Keep the image up to date.
