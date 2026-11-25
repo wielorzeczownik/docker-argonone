@@ -1,6 +1,6 @@
 services:
   argonone:
-    image: wielorzeczownik/argonone:systemd
+    image: wielorzeczownik/argonone:systemd@sha256:60c2bf5709f0911e89aa27616a8d6ad88ceb68cb874a9732aa114d9171e6a044
     container_name: argonone
     # needed so the power button can shut down the host
     privileged: true
